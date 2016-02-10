@@ -216,7 +216,13 @@ void CSoundHandler::setVolume(ui32 percent)
 	CAudioBase::setVolume(percent);
 
 	if (initialized)
-		Mix_Volume(-1, (MIX_MAX_VOLUME * volume)/100);
+		setChannelVolume(-1, volume);
+}
+
+// Sets the sound volume, from 0 (mute) to 100
+void CSoundHandler::setChannelVolume(int channel, ui32 percent)
+{
+	Mix_Volume(channel, (MIX_MAX_VOLUME * percent)/100);
 }
 
 void CSoundHandler::setCallback(int channel, std::function<void()> function)

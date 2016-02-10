@@ -263,6 +263,9 @@ public:
 	void sendCustomEvent(int code);
 	void proposeLoadingGame();
 
+	// Ambient sounds
+	void updateAmbientSounds();
+
 	///returns true if all events are processed internally
 	bool capturedAllEvents();
 

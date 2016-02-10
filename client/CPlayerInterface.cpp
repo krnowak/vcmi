@@ -260,6 +260,7 @@ void CPlayerInterface::heroMoved(const TryMoveHero & details)
 
 	if(makingTurn  &&  hero->tempOwner == playerID) //we are moving our hero - we may need to update assigned path
 	{
+		updateAmbientSounds();
 		//We may need to change music - select new track, music handler will change it if needed
 		CCS->musich->playMusicFromSet("terrain", LOCPLINT->cb->getTile(hero->visitablePos())->terType, true);
 
@@ -2812,4 +2813,84 @@ void CPlayerInterface::showWorldViewEx(const std::vector<ObjectPosInfo>& objectP
 	std::copy(objectPositions.begin(), objectPositions.end(), std::back_inserter(adventureInt->worldViewOptions.iconPositions));
 
 	viewWorldMap();
+}
+
+void CPlayerInterface::updateAmbientSounds()
+{
+	std::unordered_set<int3, ShashInt3> tiles;
+	int3 pos = currentSelection->getSightCenter();
+	cb->getVisibleTilesInRange(tiles, pos, 3, 2);
+	std::map<ObjectInstanceID, ui32> currentObjects;
+
+
+	for(int3 tile : tiles)
+	{
+		ui32 volume = 100;
+		switch(static_cast<int>(pos.chebdist2d(tile)))
+		{
+		case 1:
+			volume = 90;
+			break;
+		case 2:
+			volume = 60;
+			break;
+		case 3:
+			volume = 30;
+			break;
+		}
+		volume = (CCS->soundh->getVolume() / 100.0) * volume;
+
+		auto updateObjects = [&](ObjectInstanceID id) -> void
+		{
+			if(vstd::contains(currentObjects, id))
+			{
+				if(volume > currentObjects[id])
+					currentObjects[id] = volume;
+			}
+			else
+				currentObjects.insert(std::make_pair(id, volume));
+		};
+
+		auto tt = cb->getTile(tile);
+		if(tt->isWater())
+			updateObjects(ObjectInstanceID());
+
+		auto obj = tt->topVisitableObj(pos == tile);
+		if(obj && obj->ID != Obj::HERO)
+			updateObjects(obj->id);
+	}
+
+	auto channels = CCS->soundh->ambientChannels;
+	for(auto pair : channels)
+	{
+		if(!vstd::contains(currentObjects, pair.first))
+		{
+			CCS->soundh->stopSound(pair.second);
+			CCS->soundh->ambientChannels -= pair;
+			logGlobal->warnStream() << "Stop channel " << pair.second;
+		}
+		else
+		{
+			CCS->soundh->setChannelVolume(pair.second, currentObjects[pair.first]);
+			logGlobal->warnStream() << "Set channel " << pair.second << " volume to " << currentObjects[pair.first];
+		}
+	}
+
+	static std::vector<soundBase::soundID> sounds = {soundBase::LOOPAIR, soundBase::LANDMINE, soundBase::LOOPCAMP, soundBase::LOOPFLAG};
+	for(auto pair : currentObjects)
+	{
+		if(!vstd::contains(CCS->soundh->ambientChannels, pair.first))
+		{
+			soundBase::soundID sound;
+			if(pair.first == ObjectInstanceID())
+				sound = soundBase::LOOPOCEA;
+			else
+				sound = *RandomGeneratorUtil::nextItem(sounds, CRandomGenerator::getDefault());
+
+			auto channel = CCS->soundh->playSound(sound, -1);
+			CCS->soundh->setChannelVolume(channel, pair.second);
+			CCS->soundh->ambientChannels.insert(std::make_pair(pair.first, channel));
+			logGlobal->warnStream() << "New channel " << channel;
+		}
+	}
 }

@@ -18,6 +18,7 @@ struct _Mix_Music;
 struct SDL_RWops;
 typedef struct _Mix_Music Mix_Music;
 struct Mix_Chunk;
+class ObjectInstanceID;
 
 class CAudioBase {
 protected:
@@ -56,6 +57,7 @@ public:
 	void release() override;
 
 	void setVolume(ui32 percent) override;
+	void setChannelVolume(int channel, ui32 percent);
 
 	// Sounds
 	int playSound(soundBase::soundID soundID, int repeats=0);
@@ -70,6 +72,8 @@ public:
 	std::vector<soundBase::soundID> pickupSounds;
 	std::vector<soundBase::soundID> horseSounds;
 	std::vector<soundBase::soundID> battleIntroSounds;
+
+	std::map<ObjectInstanceID, int> ambientChannels;
 };
 
 // Helper //now it looks somewhat useless
