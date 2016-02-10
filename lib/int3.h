@@ -110,6 +110,11 @@ public:
 	{
 		return abs(o.x - x) + abs(o.y - y);
 	}
+	//chebyshev distance used for ambient sounds (z coord is not used)
+	double chebdist2d(const int3 & o) const
+	{
+		return abs(std::max(abs(o.x) - abs(x), abs(o.y) - abs(y)));
+	}
 
 	bool areNeighbours(const int3 & o) const
 	{

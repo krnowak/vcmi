@@ -649,7 +649,7 @@ void CPathfinder::initializePatrol()
 		if(hero->patrol.patrolRadius)
 		{
 			state = PATROL_RADIUS;
-			gs->getTilesInRange(patrolTiles, hero->patrol.initialPos, hero->patrol.patrolRadius, boost::optional<PlayerColor>(), 0, true);
+			gs->getTilesInRange(patrolTiles, hero->patrol.initialPos, hero->patrol.patrolRadius, boost::optional<PlayerColor>(), 0, 1);
 		}
 		else
 			state = PATROL_LOCKED;
