@@ -183,19 +183,20 @@
 		"index" :53,
 		"handler": "mine",
 		"types" : {
-			"sawmill" :       { "index" : 0, "rmg" : { "value" : 1500 } },
-			"alchemistLab" :  { "index" : 1, "rmg" : { "value" : 3500 } },
-			"orePit" :        { "index" : 2, "rmg" : { "value" : 1500 } },
-			"sulfurDune" :    { "index" : 3, "rmg" : { "value" : 3500 } },
-			"crystalCavern" : { "index" : 4, "rmg" : { "value" : 3500 } },
-			"gemPond" :       { "index" : 5, "rmg" : { "value" : 3500 } },
-			"goldMine" :      { "index" : 6, "rmg" : { "value" : 7000 } },
-			"abandoned" :	  { "index" : 7}
+			"sawmill" :       { "index" : 0, "rmg" : { "value" : 1500 }, "ambientSound" : "LOOPLUMB" },
+			"alchemistLab" :  { "index" : 1, "rmg" : { "value" : 3500 }, "ambientSound" : "LOOPSTAR" },
+			"orePit" :        { "index" : 2, "rmg" : { "value" : 1500 }, "ambientSound" : "LOOPSULF" },
+			"sulfurDune" :    { "index" : 3, "rmg" : { "value" : 3500 }, "ambientSound" : "LOOPSULF" },
+			"crystalCavern" : { "index" : 4, "rmg" : { "value" : 3500 }, "ambientSound" : "LOOPCRYS" },
+			"gemPond" :       { "index" : 5, "rmg" : { "value" : 3500 }, "ambientSound" : "LOOPGEMP" },
+			"goldMine" :      { "index" : 6, "rmg" : { "value" : 7000 }, "ambientSound" : "LOOPMINE" },
+			"abandoned" :	  { "index" : 7,}
 		}
 	},
 	"abandonedMine" : {
 		"index" :220, 
 		"handler": "mine",
+		"ambientSound" : "LOOPCAVE",
 		"types" : {
 			"mine" : { "index" : 7 }
 		}
@@ -205,16 +206,16 @@
 		"index" :33, 
 		"handler": "garrison",
 		"types":{
-			"normal":{"index": 0},
-			"antiMagic":{"index": 1}			
+			"normal":{"index": 0, "ambientSound" : "LOOPSWAR"},
+			"antiMagic":{"index": 1, "ambientSound" : "LOOPMAGI"}
 		}	
 	},
 	"garrisonVertical": { 
 		"index" :219, 
 		"handler": "garrison",
 		"types":{
-			"normal":{"index": 0},
-			"antiMagic":{"index": 1}			
+			"normal":{"index": 0, "ambientSound" : "LOOPSWAR"},
+			"antiMagic":{"index": 1, "ambientSound" : "LOOPMAGI"}			
 		}	
 	},
 
@@ -222,6 +223,7 @@
 	"monolithOneWayEntrance" : {
 		"index" :43,
 		"handler": "monolith",
+		"ambientSound" : "LOOPMON1",
 		"types" : {
 			"monolith1" : { "index" : 0 },
 			"monolith2" : { "index" : 1 },
@@ -250,6 +252,7 @@
 	"monolithTwoWay" : {
 		"index" :45,
 		"handler": "monolith",
+		"ambientSound" : "LOOPMON2",
 		"types" : {
 			"monolith1" : { "index" : 0 },
 			"monolith2" : { "index" : 1 },
