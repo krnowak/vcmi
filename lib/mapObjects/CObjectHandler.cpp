@@ -129,7 +129,8 @@ CGObjectInstance::CGObjectInstance():
 	ID(Obj::NO_OBJ),
 	subID(-1),
 	tempOwner(PlayerColor::UNFLAGGABLE),
-	blockVisit(false)
+	blockVisit(false),
+	ambientSound(soundBase::invalid)
 {
 }
 CGObjectInstance::~CGObjectInstance()
@@ -212,6 +213,8 @@ void CGObjectInstance::initObj()
 		blockVisit = true;
 		break;
 	}
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 void CGObjectInstance::setProperty( ui8 what, ui32 val )

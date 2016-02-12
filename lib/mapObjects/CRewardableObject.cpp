@@ -621,6 +621,8 @@ void CGPickable::initObj()
 		}
 		break;
 	}
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -743,6 +745,8 @@ void CGBonusingObject::initObj()
 		info[0].reward.movePoints = 400;
 		break;
 	}
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 CVisitInfo CGBonusingObject::getVisitInfo(int index, const CGHeroInstance *h) const
@@ -885,6 +889,8 @@ void CGOnceVisitable::initObj()
 		}
 		break;
 	}
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1017,6 +1023,8 @@ void CGVisitableOPH::initObj()
 			canRefuse = true;
 			break;
 	}
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1065,6 +1073,8 @@ void CGVisitableOPW::initObj()
 		info[0].message.addTxt(MetaString::ADVOB_TXT, 164);
 		break;
 	}
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 void CGVisitableOPW::setPropertyDer(ui8 what, ui32 val)
@@ -1095,6 +1105,8 @@ void CGMagicSpring::initObj()
 	info.push_back(visit);
 	onEmpty.addTxt(MetaString::ADVOB_TXT, 75);
 	soundID = soundBase::GENIE;
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 std::vector<int3> CGMagicSpring::getVisitableOffsets() const

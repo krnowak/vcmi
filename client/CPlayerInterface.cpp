@@ -1605,6 +1605,7 @@ const CArmedInstance * CPlayerInterface::getSelection()
 void CPlayerInterface::setSelection(const CArmedInstance * obj)
 {
 	currentSelection = obj;
+	updateAmbientSounds();
 }
 
 void CPlayerInterface::update()
@@ -2817,12 +2818,10 @@ void CPlayerInterface::showWorldViewEx(const std::vector<ObjectPosInfo>& objectP
 
 void CPlayerInterface::updateAmbientSounds()
 {
-	std::unordered_set<int3, ShashInt3> tiles;
-	int3 pos = currentSelection->getSightCenter();
-	cb->getVisibleTilesInRange(tiles, pos, 3, 2);
 	std::map<ObjectInstanceID, ui32> currentObjects;
-
-
+	int3 pos = currentSelection->getSightCenter();
+	std::unordered_set<int3, ShashInt3> tiles;
+	cb->getVisibleTilesInRange(tiles, pos, 3, 2);
 	for(int3 tile : tiles)
 	{
 		ui32 volume = 100;
@@ -2838,7 +2837,8 @@ void CPlayerInterface::updateAmbientSounds()
 			volume = 30;
 			break;
 		}
-		volume = (CCS->soundh->getVolume() / 100.0) * volume;
+		// Maximal ambient sounds volume must be about 20% of global effects volume
+		volume = (CCS->soundh->getVolume() / 100.0 / 5) * volume;
 
 		auto updateObjects = [&](ObjectInstanceID id) -> void
 		{
@@ -2852,11 +2852,13 @@ void CPlayerInterface::updateAmbientSounds()
 		};
 
 		auto tt = cb->getTile(tile);
-		if(tt->isWater())
+		if(tt->isCoastal())
 			updateObjects(ObjectInstanceID());
 
+		//TODO handling for static objects (Volcanos) and special terrains
+
 		auto obj = tt->topVisitableObj(pos == tile);
-		if(obj && obj->ID != Obj::HERO)
+		if(obj && obj->ambientSound != soundBase::invalid)
 			updateObjects(obj->id);
 	}
 
@@ -2876,7 +2878,6 @@ void CPlayerInterface::updateAmbientSounds()
 		}
 	}
 
-	static std::vector<soundBase::soundID> sounds = {soundBase::LOOPAIR, soundBase::LANDMINE, soundBase::LOOPCAMP, soundBase::LOOPFLAG};
 	for(auto pair : currentObjects)
 	{
 		if(!vstd::contains(CCS->soundh->ambientChannels, pair.first))
@@ -2885,7 +2886,7 @@ void CPlayerInterface::updateAmbientSounds()
 			if(pair.first == ObjectInstanceID())
 				sound = soundBase::LOOPOCEA;
 			else
-				sound = *RandomGeneratorUtil::nextItem(sounds, CRandomGenerator::getDefault());
+				sound = static_cast<soundBase::soundID>(cb->getObj(pair.first)->ambientSound);
 
 			auto channel = CCS->soundh->playSound(sound, -1);
 			CCS->soundh->setChannelVolume(channel, pair.second);

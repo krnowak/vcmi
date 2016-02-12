@@ -54,6 +54,9 @@ void CGDwelling::initObj()
 		assert(0);
 		break;
 	}
+
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
+
 }
 
 void CGDwelling::setPropertyDer(ui8 what, ui32 val)

@@ -9,6 +9,7 @@
 #include "../CGeneralTextHandler.h"
 #include "../CModHandler.h"
 #include "../JsonNode.h"
+#include "../CSoundBase.h"
 
 #include "CRewardableConstructor.h"
 #include "CommonConstructors.h"
@@ -191,6 +192,13 @@ CObjectClassesHandler::ObjectContainter * CObjectClassesHandler::loadFromJson(co
 	{
 		loadObjectEntry(entry.second, obj);
 	}
+
+	int ambientId = vstd::find_pos(soundBase::stringsList(), json["ambientSound"].String());
+	if(ambientId != -1)
+		obj->ambientSound = ambientId;
+	else
+		obj->ambientSound = soundBase::invalid;
+
 	return obj;
 }
 
@@ -335,6 +343,11 @@ std::string CObjectClassesHandler::getObjectHandlerName(si32 type) const
 	return objects.at(type)->handlerName;
 }
 
+void AObjectTypeHandler::setAmbient(CGObjectInstance * obj) const
+{
+	obj->ambientSound = ambientSound;
+}
+
 void AObjectTypeHandler::setType(si32 type, si32 subtype)
 {
 	this->type = type;
@@ -378,6 +391,13 @@ void AObjectTypeHandler::init(const JsonNode & input, boost::optional<std::strin
 		objectName = name;
 	else
 		objectName.reset(input["name"].String());
+
+	int ambientId = vstd::find_pos(soundBase::stringsList(), input["ambientSound"].String());
+	if(ambientId != -1)
+		ambientSound = ambientId;
+	else
+		ambientSound = soundBase::invalid;
+
 
 	initTypeData(input);
 }

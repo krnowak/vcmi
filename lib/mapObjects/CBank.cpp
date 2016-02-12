@@ -39,6 +39,7 @@ void CBank::initObj()
 	daycounter = 0;
 	resetDuration = 0;
 	VLC->objtypeh->getHandlerFor(ID, subID)->configureObject(this, cb->gameState()->getRandomGenerator());
+	VLC->objtypeh->getHandlerFor(ID, subID)->setAmbient(this);
 }
 
 std::string CBank::getHoverText(PlayerColor player) const
