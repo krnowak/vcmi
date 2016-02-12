@@ -2,8 +2,8 @@
 	"creatureGeneratorCommon" : {
 		"index" :17,
 		"handler": "dwelling",
-		"ambientSound" : "LOOPSWOR",
 		"base" : {
+			"ambientSound" : "LOOPSWOR",
 			"base" : {
 				"visitableFrom" : [ "---", "+++", "+++" ],
 				"mask" : [ "VVV", "VBB", "VAA" ]
@@ -27,7 +27,7 @@
 			"fireLake" :         { "index" : 14, "creatures" : [ [ "efreet" ] ], "ambientSound" : "LOOPVENT" },
 			"homestead" :        { "index" : 15, "creatures" : [ [ "woodElf" ] ], "ambientSound" : "LOOPELF" },
 			"fireConflux" :      { "index" : 16, "creatures" : [ [ "fireElemental" ] ], "ambientSound" : "LOOPFIRE" },
-			"parapet" :          { "index" : 17, "creatures" : [ [ "stoneGargoyle" ] ], "ambientSound" : "LOOPCAVE"  },
+			"parapet" :          { "index" : 17, "creatures" : [ [ "stoneGargoyle" ] ], "ambientSound" : "LOOPGRIF"  },
 			"altarOfWishes" :    { "index" : 18, "creatures" : [ [ "genie" ] ], "ambientSound" : "LOOPMAGI" },
 			"wolfPen" :          { "index" : 19, "creatures" : [ [ "goblinWolfRider" ] ], "ambientSound" : "LOOPWOLF" },
 			"gnollHut" :         { "index" : 20, "creatures" : [ [ "gnoll" ] ], "ambientSound" : "LOOPORC" },
@@ -50,7 +50,7 @@
 			"demonGate" :        { "index" : 37, "creatures" : [ [ "demon" ] ], "ambientSound" : "LOOPCAVE" },
 			"ogreFort" :         { "index" : 38, "creatures" : [ [ "ogre" ] ], "ambientSound" : "LOOPOGRE" },
 			"orcTower" :         { "index" : 39, "creatures" : [ [ "orc" ] ], "ambientSound" : "LOOPORC" },
-			"hellHole" :         { "index" : 40, "creatures" : [ [ "pitFiend" ] ], "ambientSound" : "LOOPFORE" },
+			"hellHole" :         { "index" : 40, "creatures" : [ [ "pitFiend" ] ], "ambientSound" : "LOOPFIRE" },
 			"dragonCave" :       { "index" : 41, "creatures" : [ [ "redDragon" ] ], "ambientSound" : "LOOPDRAG" },
 			"cliffNest" :        { "index" : 42, "creatures" : [ [ "roc" ] ], "ambientSound" : "LOOPBIRD" },
 			"workshop" :         { "index" : 43, "creatures" : [ [ "gremlin" ] ], "ambientSound" : "LOOPGREM" },

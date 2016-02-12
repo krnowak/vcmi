@@ -190,13 +190,15 @@
 			"crystalCavern" : { "index" : 4, "rmg" : { "value" : 3500 }, "ambientSound" : "LOOPCRYS" },
 			"gemPond" :       { "index" : 5, "rmg" : { "value" : 3500 }, "ambientSound" : "LOOPGEMP" },
 			"goldMine" :      { "index" : 6, "rmg" : { "value" : 7000 }, "ambientSound" : "LOOPMINE" },
-			"abandoned" :	  { "index" : 7,}
+			"abandoned" :	  { "index" : 7, "ambientSound" : "LOOPCAVE" }
 		}
 	},
 	"abandonedMine" : {
 		"index" :220, 
 		"handler": "mine",
-		"ambientSound" : "LOOPCAVE",
+		"base" : {
+			"ambientSound" : "LOOPCAVE"
+		},
 		"types" : {
 			"mine" : { "index" : 7 }
 		}
@@ -223,7 +225,9 @@
 	"monolithOneWayEntrance" : {
 		"index" :43,
 		"handler": "monolith",
-		"ambientSound" : "LOOPMON1",
+		"base" : {
+			"ambientSound" : "LOOPMON1"
+		},
 		"types" : {
 			"monolith1" : { "index" : 0 },
 			"monolith2" : { "index" : 1 },
@@ -238,6 +242,9 @@
 	"monolithOneWayExit" : {
 		"index" :44,
 		"handler": "monolith",
+		"base" : {
+			"ambientSound" : "LOOPMON1"
+		},
 		"types" : {
 			"monolith1" : { "index" : 0 },
 			"monolith2" : { "index" : 1 },
@@ -252,7 +259,9 @@
 	"monolithTwoWay" : {
 		"index" :45,
 		"handler": "monolith",
-		"ambientSound" : "LOOPMON2",
+		"base" : {
+			"ambientSound" : "LOOPMON2"
+		},
 		"types" : {
 			"monolith1" : { "index" : 0 },
 			"monolith2" : { "index" : 1 },

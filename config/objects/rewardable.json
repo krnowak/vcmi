@@ -4,7 +4,9 @@
 	"magicSpring" : {//magic source
 		"index" : 48,
 		"handler": "magicSpring",
-		"ambientSound" : "LOOPFOUN",
+		"base" : {
+			"ambientSound" : "LOOPFOUN"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0//,
@@ -21,7 +23,9 @@
 	"mysticalGarden" : {
 		"index" : 55,
 		"handler": "oncePerWeek",
-		"ambientSound" : "LOOPLEPR",
+		"base" : {
+			"ambientSound" : "LOOPLEPR"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -35,7 +39,9 @@
 	"windmill" :{
 		"index" : 112,
 		"handler": "oncePerWeek",
-		"ambientSound" : "LOOPWIND",
+		"base" : {
+			"ambientSound" : "LOOPWIND"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -49,7 +55,9 @@
 	"waterWheel" : {
 		"index" : 109,
 		"handler": "oncePerWeek",
-		"ambientSound" : "LOOPMILL",
+		"base" : {
+			"ambientSound" : "LOOPMILL"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -117,7 +125,9 @@
 	"campfire" :{
 		"index" : 12,
 		"handler": "pickable",
-		"ambientSound" : "LOOPCAMP",
+		"base" : {
+			"ambientSound" : "LOOPCAMP"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -184,7 +194,9 @@
 	"arena" : {
 		"index" : 4,
 		"handler": "oncePerHero",
-		"ambientSound" : "LOOPAREN",
+		"base" : {
+			"ambientSound" : "LOOPAREN"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -198,7 +210,9 @@
 	"marlettoTower" : {
 		"index" : 23,
 		"handler": "oncePerHero",
-		"ambientSound" : "LOOPSWAR",
+		"base" : {
+			"ambientSound" : "LOOPSWAR"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -212,7 +226,9 @@
 	"gardenOfRevelation" : {
 		"index" : 32,
 		"handler": "oncePerHero",
-		"ambientSound" : "LOOPGARD",
+		"base" : {
+			"ambientSound" : "LOOPGARD"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -239,6 +255,9 @@
 	"mercenaryCamp" : {
 		"index" : 51,
 		"handler": "oncePerHero",
+		"base" : {
+			"ambientSound" : "LOOPMERC"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -252,7 +271,9 @@
 	"starAxis" :{
 		"index" : 61,
 		"handler": "oncePerHero",
-		"ambientSound" : "LOOPSTAR",
+		"base" : {
+			"ambientSound" : "LOOPSTAR"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -280,7 +301,9 @@
 	"schoolOfMagic" : {
 		"index" : 47,
 		"handler": "oncePerHero",
-		"ambientSound" : "LOOPMAGI",
+		"base" : {
+			"ambientSound" : "LOOPMAGI"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -294,7 +317,9 @@
 	"schoolOfWar" : {
 		"index" : 107,
 		"handler": "oncePerHero",
-		"ambientSound" : "LOOPSWAR",
+		"base" : {
+			"ambientSound" : "LOOPSWAR"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -308,7 +333,9 @@
 	"learningStone" : {
 		"index" : 100,
 		"handler": "oncePerHero",
-		"ambientSound" : "LOOPLEAR",
+		"base" : {
+			"ambientSound" : "LOOPLEAR"
+		},
 		"types" : {
 			"object" : { 
 				"index" : 0,
@@ -324,7 +351,9 @@
 	"buoy" : {
 		"index" : 11,
 		"handler": "bonusingObject",
-		"ambientSound" : "LOOPBUOY",
+		"base" : {
+			"ambientSound" : "LOOPBUOY"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -352,7 +381,9 @@
 	"faerieRing" : {
 		"index" : 28,
 		"handler": "bonusingObject",
-		"ambientSound" : "LOOPFAER",
+		"base" : {
+			"ambientSound" : "LOOPFAER"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -367,7 +398,9 @@
 	"fountainOfFortune" : {
 		"index" : 30,
 		"handler": "bonusingObject",
-		"ambientSound" : "LOOPFOUN",
+		"base" : {
+			"ambientSound" : "LOOPFOUN"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -382,7 +415,9 @@
 	"fountainOfYouth" : {
 		"index" : 31,
 		"handler": "bonusingObject",
-		"ambientSound" : "LOOPFALL",
+		"base" : {
+			"ambientSound" : "LOOPFALL"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -441,7 +476,9 @@
 	"stables" : {
 		"index" : 94,
 		"handler": "bonusingObject",
-		"ambientSound" : "LOOPHORS",
+		"base" : {
+			"ambientSound" : "LOOPHORS"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -456,7 +493,9 @@
 	"temple" : {
 		"index" : 96,
 		"handler": "bonusingObject",
-		"ambientSound" : "LOOPSANC",
+		"base" : {
+			"ambientSound" : "LOOPSANC"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,
@@ -471,7 +510,9 @@
 	"rallyFlag" : {
 		"index" : 64,
 		"handler": "bonusingObject",
-		"ambientSound" : "LOOPFLAG",
+		"base" : {
+			"ambientSound" : "LOOPFLAG"
+		},
 		"types" : {
 			"object" : {
 				"index" : 0,

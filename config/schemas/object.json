@@ -18,6 +18,10 @@
 			"type":"string",
 		},
 
+		"ambientSound": {
+			"type" : "string"
+		},
+
 		"base": {
 			"type" : "object"
 		},
