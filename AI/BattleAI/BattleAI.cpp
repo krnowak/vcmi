@@ -457,8 +457,8 @@ void CBattleAI::attemptCastingSpell()
 		case OFFENSIVE_SPELL:
 			{
 				int damageDealt = 0, damageReceived = 0;
-				
-				auto stacksSuffering = ps.spell->getAffectedStacks(cb.get(), ECastingMode::HERO_CASTING, playerID, skillLevel, ps.dest, hero);
+
+				auto stacksSuffering = ps.spell->getAffectedStacks(cb.get(), ECastingMode::HERO_CASTING, hero, skillLevel, ps.dest);
 
 				if(stacksSuffering.empty())
 					return -1;
