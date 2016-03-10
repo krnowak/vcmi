@@ -26,14 +26,20 @@ void JsonSerializer::serializeBool(const std::string & fieldName, bool & value)
 		current->operator[](fieldName).Bool() = true;
 }
 
+void JsonSerializer::serializeBool(const std::string & fieldName, boost::logic::tribool & value)
+{
+	if(!boost::logic::indeterminate(value))
+		current->operator[](fieldName).Bool() = value;
+}
+
 void JsonSerializer::serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value)
 {
 	current->operator[](fieldName).String() = value ? trueValue : falseValue;
 }
 
-void JsonSerializer::serializeFloat(const std::string & fieldName, double & value)
+void JsonSerializer::serializeFloat(const std::string & fieldName, double & value, const double & defaultValue)
 {
-	if(value != 0)
+	if(defaultValue != value)
 		current->operator[](fieldName).Float() = value;
 }
 

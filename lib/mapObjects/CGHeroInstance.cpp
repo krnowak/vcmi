@@ -1503,15 +1503,41 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 		}
 	}
 	CCreatureSet::serializeJson(handler, "army");
+	handler.serializeBool<ui8>("tightFormation", formation, 1, 0);
+
+	CArtifactSet::serializeJson(handler, "artifacts");
+
+	handler.serializeString("biography", biography);
+	handler.serializeNumeric("experience", exp);
+	handler.serializeString("name", name);
 
 	{
-		auto artifacts = handler.enterStruct("artifacts");
-		if(handler.saving)
-			CArtifactSet::writeJson(handler.getCurrent());
-		else
-			CArtifactSet::readJson(handler.getCurrent());
-	}
+		static const int NO_PATROLING = -1;
+		int rawPatrolRadius = NO_PATROLING;
 
+		if(handler.saving)
+		{
+			rawPatrolRadius = patrol.patrolling ? patrol.patrolRadius : NO_PATROLING;
+		}
+
+		handler.serializeNumeric("patrolRadius", rawPatrolRadius, NO_PATROLING);
+
+		if(!handler.saving)
+		{
+			patrol.patrolling = (rawPatrolRadius > NO_PATROLING);
+			patrol.initialPos = convertPosition(pos, false);
+			patrol.patrolRadius = (rawPatrolRadius > NO_PATROLING) ? rawPatrolRadius : 0;
+		}
+	}
+	handler.serializeIntId("portrait", &VLC->heroh->decodeHero, &VLC->heroh->encodeHero, UNINITIALIZED_PORTRAIT, portrait);
+
+	//primary skills
+
+	//secondary skills
+
+	handler.serializeBool<ui8>("female", sex, 1, 0, 0xFF);
+
+	//spellBook
 }
 
 bool CGHeroInstance::isMissionCritical() const

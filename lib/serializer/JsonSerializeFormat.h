@@ -11,29 +11,44 @@
 #pragma once
 
 class JsonNode;
-
 class JsonSerializeFormat;
+class JsonStructSerializer;
 
-class JsonStructSerializer: public boost::noncopyable
+class JsonSerializeHelper: public boost::noncopyable
 {
 public:
-	JsonStructSerializer(JsonStructSerializer && other);
-	virtual ~JsonStructSerializer();
-
-	JsonStructSerializer enterStruct(const std::string & fieldName);
+	JsonSerializeHelper(JsonSerializeHelper && other);
+	virtual ~JsonSerializeHelper();
 
 	JsonNode & get();
 
 	JsonSerializeFormat * operator->();
+
+	JsonStructSerializer enterStruct(const std::string & fieldName);
+
+protected:
+	JsonSerializeHelper(JsonSerializeFormat & owner_, JsonNode * thisNode_);
+
+	JsonSerializeFormat & owner;
+
+	JsonNode * thisNode;
+	friend class JsonStructSerializer;
+private:
+	bool restoreState;
+	JsonNode * parentNode;
+};
+
+class JsonStructSerializer: public JsonSerializeHelper
+{
+public:
+	JsonStructSerializer(JsonStructSerializer && other);
+
 private:
 	JsonStructSerializer(JsonSerializeFormat & owner_, const std::string & fieldName);
-	JsonStructSerializer(JsonStructSerializer & parent, const std::string & fieldName);
+	JsonStructSerializer(JsonSerializeHelper & parent, const std::string & fieldName);
 
-	bool restoreState;
-	JsonSerializeFormat & owner;
-	JsonNode * parentNode;
-	JsonNode * thisNode;
 	friend class JsonSerializeFormat;
+	friend class JsonSerializeHelper;
 };
 
 class JsonSerializeFormat: public boost::noncopyable
@@ -75,7 +90,7 @@ public:
 	JsonStructSerializer enterStruct(const std::string & fieldName);
 
 	template <typename T>
-	void serializeBool(const std::string & fieldName, const T trueValue, const T falseValue, T & value)
+	void serializeBool(const std::string & fieldName, T & value, const T trueValue, const T falseValue)
 	{
 		bool temp = (value == trueValue);
 		serializeBool(fieldName, temp);
@@ -83,7 +98,29 @@ public:
 			value = temp ? trueValue : falseValue;
 	}
 
+	template <typename T>
+	void serializeBool(const std::string & fieldName, T & value, const T trueValue, const T falseValue, const T defaultValue)
+	{
+		boost::logic::tribool temp(boost::logic::indeterminate);
+
+		if(value == trueValue)
+			temp = true;
+		else if(value == falseValue)
+			temp = false;
+
+		serializeBool(fieldName, temp);
+		if(!saving)
+		{
+			if(boost::logic::indeterminate(temp))
+				value = defaultValue;
+			else
+				value = temp ? trueValue : falseValue;
+		}
+	}
+
 	virtual void serializeBool(const std::string & fieldName, bool & value) = 0;
+
+	virtual void serializeBool(const std::string & fieldName, boost::logic::tribool & value) = 0;
 
 	virtual void serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value) = 0;
 
@@ -114,7 +151,17 @@ public:
 	void serializeNumeric(const std::string & fieldName, T & value)
 	{
 		double temp = value;
-		serializeFloat(fieldName, temp);
+		serializeFloat(fieldName, temp, 0);
+		if(!saving)
+			value = temp;
+	};
+
+	template <typename T>
+	void serializeNumeric(const std::string & fieldName, T & value, const T & defaultValue)
+	{
+		double tempDefault = defaultValue;
+		double temp = value;
+		serializeFloat(fieldName, temp, tempDefault);
 		if(!saving)
 			value = temp;
 	};
@@ -131,18 +178,20 @@ public:
 			value = T(tempValue);
 	}
 
+	virtual void serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value) = 0;
+
 protected:
 	JsonNode * root;
 	JsonNode * current;
 
 	JsonSerializeFormat(JsonNode & root_, const bool saving_);
 
-	virtual void serializeFloat(const std::string & fieldName, double & value) = 0;
+	virtual void serializeFloat(const std::string & fieldName, double & value, const double & defaultValue) = 0;
 
 	virtual void serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value) = 0;
 
-	virtual void serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value) = 0;
 private:
+	friend class JsonSerializeHelper;
 	friend class JsonStructSerializer;
 };
 

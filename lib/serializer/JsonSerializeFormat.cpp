@@ -14,56 +14,65 @@
 
 #include "../JsonNode.h"
 
-
-//JsonStructSerializer
-JsonStructSerializer::JsonStructSerializer(JsonStructSerializer&& other):
-	restoreState(false),
+JsonSerializeHelper::JsonSerializeHelper(JsonSerializeHelper && other):
 	owner(other.owner),
-	parentNode(other.parentNode),
-	thisNode(other.thisNode)
+	thisNode(other.thisNode),
+	restoreState(false),
+	parentNode(other.parentNode)
 {
-
+	std::swap(restoreState, other.restoreState);
 }
 
-JsonStructSerializer::~JsonStructSerializer()
+JsonSerializeHelper::~JsonSerializeHelper()
 {
 	if(restoreState)
 		owner.current = parentNode;
 }
 
-JsonStructSerializer::JsonStructSerializer(JsonSerializeFormat& owner_, const std::string& fieldName):
-	restoreState(true),
-	owner(owner_),
-	parentNode(owner.current),
-	thisNode(&(parentNode->operator[](fieldName)))
+JsonNode & JsonSerializeHelper::get()
 {
-	owner.current = thisNode;
+	return * thisNode;
 }
 
-JsonStructSerializer::JsonStructSerializer(JsonStructSerializer & parent, const std::string & fieldName):
-	restoreState(true),
-	owner(parent.owner),
-	parentNode(parent.thisNode),
-	thisNode(&(parentNode->operator[](fieldName)))
-{
-	owner.current = thisNode;
-}
-
-JsonStructSerializer JsonStructSerializer::enterStruct(const std::string & fieldName)
-{
-	return JsonStructSerializer(*this, fieldName);
-}
-
-JsonNode& JsonStructSerializer::get()
-{
-	return *thisNode;
-}
-
-JsonSerializeFormat * JsonStructSerializer::operator->()
+JsonSerializeFormat * JsonSerializeHelper::operator->()
 {
 	return &owner;
 }
 
+JsonSerializeHelper::JsonSerializeHelper(JsonSerializeFormat & owner_, JsonNode * thisNode_):
+	owner(owner_),
+	thisNode(thisNode_),
+	restoreState(true),
+	parentNode(owner.current)
+{
+	owner.current = thisNode;
+}
+
+JsonStructSerializer JsonSerializeHelper::enterStruct(const std::string & fieldName)
+{
+	return JsonStructSerializer(*this, fieldName);
+}
+
+//JsonStructSerializer
+JsonStructSerializer::JsonStructSerializer(JsonStructSerializer && other):
+	JsonSerializeHelper(std::move(static_cast<JsonSerializeHelper &>(other)))
+{
+
+}
+
+JsonStructSerializer::JsonStructSerializer(JsonSerializeFormat & owner_, const std::string & fieldName):
+	JsonSerializeHelper(owner_, &(owner_.current->operator[](fieldName)))
+{
+
+}
+
+JsonStructSerializer::JsonStructSerializer(JsonSerializeHelper & parent, const std::string & fieldName):
+	JsonSerializeHelper(parent.owner, &(parent.thisNode->operator[](fieldName)))
+{
+
+}
+
+//JsonSerializeFormat::LIC
 JsonSerializeFormat::LIC::LIC(const std::vector<bool> & Standard, const TDecoder & Decoder, const TEncoder & Encoder):
 	standard(Standard), decoder(Decoder), encoder(Encoder)
 {

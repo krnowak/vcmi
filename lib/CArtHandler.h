@@ -26,6 +26,7 @@ class CArtifactSet;
 class CArtifactInstance;
 class CRandomGenerator;
 class CMap;
+class JsonSerializeFormat;
 
 #define ART_BEARER_LIST \
 	ART_BEARER(HERO)\
@@ -335,9 +336,7 @@ public:
 	void artDeserializationFix(CBonusSystemNode *node);
 
 protected:
-	void writeJson(JsonNode & json) const;
-	void readJson(const JsonNode & json);
-
+	void serializeJson(JsonSerializeFormat & handler, const std::string & fieldName);
 protected:
 	std::pair<const CCombinedArtifactInstance *, const CArtifactInstance *> searchForConstituent(int aid) const;
 };

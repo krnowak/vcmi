@@ -1194,7 +1194,7 @@ void CGTownInstance::serializeJsonOptions(JsonSerializeFormat & handler)
 {
 	CGObjectInstance::serializeJsonOwner(handler);
 	CCreatureSet::serializeJson(handler, "army");
-	handler.serializeBool<ui8>("tightFormation", 1, 0, formation);
+	handler.serializeBool<ui8>("tightFormation", formation, 1, 0);
 	handler.serializeString("name", name);
 
 

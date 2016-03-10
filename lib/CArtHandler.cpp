@@ -24,6 +24,7 @@
 
 #include "mapObjects/CObjectClassesHandler.h"
 #include "mapping/CMap.h"
+#include "serializer/JsonSerializeFormat.h"
 
 // Note: list must match entries in ArtTraits.txt
 #define ART_POS_LIST    \
@@ -1389,12 +1390,7 @@ void CArtifactSet::artDeserializationFix(CBonusSystemNode *node)
 			node->attachTo(elem.second.artifact);
 }
 
-void CArtifactSet::writeJson(JsonNode& json) const
-{
-
-}
-
-void CArtifactSet::readJson(const JsonNode& json)
+void CArtifactSet::serializeJson(JsonSerializeFormat& handler, const std::string& fieldName)
 {
 
 }

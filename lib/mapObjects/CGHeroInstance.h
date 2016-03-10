@@ -65,8 +65,8 @@ public:
 	ConstTransitivePtr<CCommanderInstance> commander;
 	const CGBoat *boat; //set to CGBoat when sailing
 
-	static const ui32 UNINITIALIZED_PORTRAIT = -1;
-	static const ui32 UNINITIALIZED_MANA = -1;
+	static const si32 UNINITIALIZED_PORTRAIT = -1;
+	static const si32 UNINITIALIZED_MANA = -1;
 	static const ui32 UNINITIALIZED_MOVEMENT = -1;
 
 	//std::vector<const CArtifact*> artifacts; //hero's artifacts from bag

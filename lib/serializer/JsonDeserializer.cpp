@@ -25,6 +25,15 @@ void JsonDeserializer::serializeBool(const std::string & fieldName, bool & value
 	value = current->operator[](fieldName).Bool();
 }
 
+void JsonDeserializer::serializeBool(const std::string & fieldName, boost::logic::tribool & value)
+{
+	const JsonNode & data = current->operator[](fieldName);
+	if(data.getType() != JsonNode::DATA_BOOL)
+		value = boost::logic::indeterminate;
+	else
+		value = data.Bool();
+}
+
 void JsonDeserializer::serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value)
 {
 	const JsonNode & tmp = current->operator[](fieldName);
@@ -32,9 +41,14 @@ void JsonDeserializer::serializeEnum(const std::string & fieldName, const std::s
 	value = tmp.String() == trueValue;
 }
 
-void JsonDeserializer::serializeFloat(const std::string & fieldName, double & value)
+void JsonDeserializer::serializeFloat(const std::string & fieldName, double & value, const double & defaultValue)
 {
-	value = current->operator[](fieldName).Float();
+	const JsonNode & data = current->operator[](fieldName);
+
+	if(data.getType() != JsonNode::DATA_FLOAT)
+		value = defaultValue;
+	else
+		value = data.Float();
 }
 
 void JsonDeserializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value)
