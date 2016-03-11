@@ -28,6 +28,7 @@ public:
 
 protected:
 	JsonSerializeHelper(JsonSerializeFormat & owner_, JsonNode * thisNode_);
+	JsonSerializeHelper(JsonSerializeHelper & parent, const std::string & fieldName);
 
 	JsonSerializeFormat & owner;
 
@@ -43,7 +44,7 @@ class JsonStructSerializer: public JsonSerializeHelper
 public:
 	JsonStructSerializer(JsonStructSerializer && other);
 
-private:
+protected:
 	JsonStructSerializer(JsonSerializeFormat & owner_, const std::string & fieldName);
 	JsonStructSerializer(JsonSerializeHelper & parent, const std::string & fieldName);
 

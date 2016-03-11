@@ -48,6 +48,15 @@ JsonSerializeHelper::JsonSerializeHelper(JsonSerializeFormat & owner_, JsonNode 
 	owner.current = thisNode;
 }
 
+JsonSerializeHelper::JsonSerializeHelper(JsonSerializeHelper & parent, const std::string & fieldName):
+	owner(parent.owner),
+	thisNode(&(parent.thisNode->operator[](fieldName))),
+	restoreState(true),
+	parentNode(parent.thisNode)
+{
+	owner.current = thisNode;
+}
+
 JsonStructSerializer JsonSerializeHelper::enterStruct(const std::string & fieldName)
 {
 	return JsonStructSerializer(*this, fieldName);
@@ -67,7 +76,7 @@ JsonStructSerializer::JsonStructSerializer(JsonSerializeFormat & owner_, const s
 }
 
 JsonStructSerializer::JsonStructSerializer(JsonSerializeHelper & parent, const std::string & fieldName):
-	JsonSerializeHelper(parent.owner, &(parent.thisNode->operator[](fieldName)))
+	JsonSerializeHelper(parent, fieldName)
 {
 
 }
