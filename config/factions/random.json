@@ -35,7 +35,7 @@
 
 
 				"marketplace":    { "id" : 14 },
-				"resourceSilo":   { "id" : 15, "requires" : [ "marketplace" ]},
+				"resourceSilo":   { "id" : 15, "upgrades" : "marketplace" },
 				"blacksmith":     { "id" : 16 },
 
 				"horde1":         { "id" : -30, "upgrades" : "dwellingLvl1" },
