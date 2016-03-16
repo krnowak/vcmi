@@ -78,16 +78,28 @@ void JsonSerializer::serializeLIC(const std::string & fieldName, LIC & value)
 	writeLICPart(fieldName, "noneOf", value.encoder, value.none);
 }
 
+void JsonSerializer::serializeLIC(const std::string & fieldName, LICSet & value)
+{
+	if(value.any != value.standard)
+	{
+		writeLICPart(fieldName, "anyOf", value.encoder, value.any);
+	}
+
+	writeLICPart(fieldName, "allOf", value.encoder, value.all);
+	writeLICPart(fieldName, "noneOf", value.encoder, value.none);
+}
+
+
 void JsonSerializer::serializeString(const std::string & fieldName, std::string & value)
 {
 	if(value != "")
 		current->operator[](fieldName).String() = value;
 }
 
-void JsonSerializer::writeLICPart(const std::string& fieldName, const std::string& partName, const TEncoder& encoder, const std::vector<bool> & data)
+void JsonSerializer::writeLICPart(const std::string & fieldName, const std::string & partName, const TEncoder & encoder, const std::vector<bool> & data)
 {
 	auto & target = current->operator[](fieldName)[partName].Vector();
-	for(si32 idx = 0; idx < data.size(); idx ++)
+	for(si32 idx = 0; idx < data.size(); idx++)
 	{
 		if(data[idx])
 		{
@@ -95,6 +107,18 @@ void JsonSerializer::writeLICPart(const std::string& fieldName, const std::strin
 			val.String() = encoder(idx);
 			target.push_back(std::move(val));
 		}
+	}
+}
+
+void JsonSerializer::writeLICPart(const std::string & fieldName, const std::string & partName, const TEncoder & encoder, const std::set<si32> & data)
+{
+	auto & target = current->operator[](fieldName)[partName].Vector();
+
+	for(const si32 item : data)
+	{
+		JsonNode val(JsonNode::DATA_STRING);
+		val.String() = encoder(item);
+		target.push_back(std::move(val));
 	}
 }
 

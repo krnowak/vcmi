@@ -383,6 +383,12 @@ bool CContentHandler::ContentTypeHandler::loadMod(std::string modName, bool vali
 	return result;
 }
 
+
+void CContentHandler::ContentTypeHandler::loadCustom()
+{
+	handler->loadCustom();
+}
+
 void CContentHandler::ContentTypeHandler::afterLoadFinalization()
 {
 	handler->afterLoadFinalization();
@@ -420,6 +426,14 @@ bool CContentHandler::loadMod(std::string modName, bool validate)
 		result &= handler.second.loadMod(modName, validate);
 	}
 	return result;
+}
+
+void CContentHandler::loadCustom()
+{
+	for(auto & handler : handlers)
+	{
+		handler.second.loadCustom();
+	}
 }
 
 void CContentHandler::afterLoadFinalization()
@@ -895,6 +909,8 @@ void CModHandler::load()
 	content.load(coreMod);
 	for(const TModID & modName : activeMods)
 		content.load(allMods[modName]);
+
+	content.loadCustom();
 
 	logGlobal->infoStream() << "\tLoading mod data: " << timer.getDiff() << "ms";
 

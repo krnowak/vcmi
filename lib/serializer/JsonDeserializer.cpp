@@ -153,6 +153,51 @@ void JsonDeserializer::serializeLIC(const std::string & fieldName, LIC & value)
 	}
 }
 
+void JsonDeserializer::serializeLIC(const std::string & fieldName, LICSet & value)
+{
+	const JsonNode & field = current->operator[](fieldName);
+
+	const JsonNode & anyOf = field["anyOf"];
+	const JsonNode & allOf = field["allOf"];
+	const JsonNode & noneOf = field["noneOf"];
+
+	value.all.clear();
+	value.none.clear();
+
+	if(anyOf.Vector().empty())
+	{
+		//permissive mode
+		value.any = value.standard;
+	}
+	else
+	{
+		//restrictive mode
+		value.any.clear();
+		readLICPart(anyOf, value.decoder, value.any);
+
+		for(si32 item : value.standard)
+			if(!vstd::contains(value.any, item))
+				value.none.insert(item);
+	}
+
+	readLICPart(allOf, value.decoder, value.all);
+	readLICPart(noneOf, value.decoder, value.none);
+
+	//remove any banned from allowed and required
+	auto isBanned = [&value](const si32 item)->bool
+	{
+		return vstd::contains(value.none, item);
+	};
+	vstd::erase_if(value.all, isBanned);
+	vstd::erase_if(value.any, isBanned);
+
+	//add all required to allowed
+	for(si32 item : value.all)
+	{
+		value.any.insert(item);
+	}
+}
+
 void JsonDeserializer::serializeString(const std::string & fieldName, std::string & value)
 {
 	value = current->operator[](fieldName).String();
@@ -172,6 +217,18 @@ void JsonDeserializer::readLICPart(const JsonNode & part, const TDecoder & decod
 			else
 				logGlobal->errorStream() << "JsonDeserializer::serializeLIC: id out of bounds " << rawId;
 		}
+	}
+}
+
+void JsonDeserializer::readLICPart(const JsonNode & part, const TDecoder & decoder, std::set<si32> & value)
+{
+	for(size_t index = 0; index < part.Vector().size(); index++)
+	{
+		const std::string & identifier = part.Vector()[index].String();
+
+		const si32 rawId = decoder(identifier);
+		if(rawId != -1)
+			value.insert(rawId);
 	}
 }
 

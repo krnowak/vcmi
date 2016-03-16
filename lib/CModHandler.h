@@ -128,6 +128,7 @@ class CContentHandler
 		/// returns true if loading was successful
 		bool preloadModData(std::string modName, std::vector<std::string> fileList, bool validate);
 		bool loadMod(std::string modName, bool validate);
+		void loadCustom();
 		void afterLoadFinalization();
 	};
 
@@ -147,6 +148,8 @@ public:
 
 	/// actually loads data in mod
 	void load(CModInfo & mod);
+
+	void loadCustom();
 
 	/// all data was loaded, time for final validation / integration
 	void afterLoadFinalization();

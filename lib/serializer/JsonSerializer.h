@@ -24,6 +24,7 @@ public:
 	void serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value) override;
 	void serializeLIC(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const std::vector<bool> & standard, std::vector<bool> & value) override;
 	void serializeLIC(const std::string & fieldName, LIC & value) override;
+	void serializeLIC(const std::string & fieldName, LICSet & value) override;
 	void serializeString(const std::string & fieldName, std::string & value) override;
 
 protected:
@@ -33,4 +34,5 @@ protected:
 
 private:
 	void writeLICPart(const std::string & fieldName, const std::string & partName, const TEncoder & encoder, const std::vector<bool> & data);
+	void writeLICPart(const std::string & fieldName, const std::string & partName, const TEncoder & encoder, const std::set<si32> & data);
 };

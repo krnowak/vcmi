@@ -91,6 +91,13 @@ JsonSerializeFormat::LIC::LIC(const std::vector<bool> & Standard, const TDecoder
 }
 
 
+JsonSerializeFormat::LICSet::LICSet(const std::set<si32>& Standard, const TDecoder & Decoder, const TEncoder & Encoder):
+	standard(Standard), decoder(Decoder), encoder(Encoder)
+{
+
+}
+
+
 //JsonSerializeFormat
 JsonSerializeFormat::JsonSerializeFormat(JsonNode & root_, const bool saving_):
 	saving(saving_),

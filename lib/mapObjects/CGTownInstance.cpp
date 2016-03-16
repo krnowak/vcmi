@@ -1093,6 +1093,21 @@ bool CGTownInstance::armedGarrison() const
 	return stacksCount() || garrisonHero;
 }
 
+const CTown * CGTownInstance::getTown() const
+{
+    if(ID == Obj::RANDOM_TOWN)
+		return VLC->townh->randomTown;
+	else
+	{
+		if(nullptr == town)
+		{
+			return VLC->townh->factions[subID]->town;
+		}
+		else
+			return town;
+	}
+}
+
 int CGTownInstance::getTownLevel() const
 {
 	// count all buildings that are not upgrades
@@ -1197,21 +1212,56 @@ void CGTownInstance::serializeJsonOptions(JsonSerializeFormat & handler)
 	handler.serializeBool<ui8>("tightFormation", formation, 1, 0);
 	handler.serializeString("name", name);
 
-
-
-	if(!handler.saving)
 	{
-		builtBuildings.insert(BuildingID::DEFAULT);//just in case
-	}
+		auto decodeBuilding = [this](const std::string & identifier) -> si32
+		{
+			auto rawId = VLC->modh->identifiers.getIdentifier("core", getTown()->getBuildingScope(), identifier);
 
-	//todo: serialize buildings
-//	{
-//		std::vector<bool> standard;
-//		standard.resize(44, true);
-//
-//
-//		JsonSerializeFormat::LIC buildingsLIC(, CTownHandler::decodeBuilding, CTownHandler::encodeBuilding);
-//	}
+			if(rawId)
+				return rawId.get();
+			else
+				return -1;
+		};
+
+		auto encodeBuilding = [this](si32 index) -> std::string
+		{
+			return getTown()->buildings.at(BuildingID(index))->identifier;
+		};
+
+		const std::set<si32> standard = getTown()->getAllBuildings();//by default all buildings are allowed
+		JsonSerializeFormat::LICSet buildingsLIC(standard, decodeBuilding, encodeBuilding);
+
+		for(const BuildingID id : forbiddenBuildings)
+			buildingsLIC.none.insert(id);
+
+		for(const BuildingID id : builtBuildings)
+			buildingsLIC.all.insert(id);
+
+		handler.serializeLIC("buildings", buildingsLIC);
+
+		if(!handler.saving)
+		{
+			//todo: process AUTO buildings
+			builtBuildings.insert(BuildingID::VILLAGE_HALL);
+
+			if(buildingsLIC.none.empty() && buildingsLIC.all.empty())
+			{
+				builtBuildings.insert(BuildingID::DEFAULT);
+
+				bool hasFort = false;
+				handler.serializeBool("hasFort",hasFort);
+				if(hasFort)
+					builtBuildings.insert(BuildingID::FORT);
+			}
+			else
+			{
+				for(const si32 item : buildingsLIC.none)
+					forbiddenBuildings.insert(BuildingID(item));
+				for(const si32 item : buildingsLIC.all)
+					builtBuildings.insert(BuildingID(item));
+			}
+		}
+	}
 
 	{
 		JsonSerializeFormat::LIC spellsLIC(VLC->spellh->getDefaultAllowed(), CSpellHandler::decodeSpell, CSpellHandler::encodeSpell);

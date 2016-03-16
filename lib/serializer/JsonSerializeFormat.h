@@ -73,6 +73,16 @@ public:
 		std::vector<bool> all, any, none;
 	};
 
+	struct LICSet
+	{
+		LICSet(const std::set<si32> & Standard, const TDecoder & Decoder, const TEncoder & Encoder);
+
+		const std::set<si32> & standard;
+		const TDecoder & decoder;
+		const TEncoder & encoder;
+		std::set<si32> all, any, none;
+	};
+
 	const bool saving;
 
 	JsonSerializeFormat() = delete;
@@ -138,6 +148,11 @@ public:
 	/** @brief Complete serialization of Logical identifier condition
 	 */
 	virtual void serializeLIC(const std::string & fieldName, LIC & value) = 0;
+
+	/** @brief Complete serialization of Logical identifier condition. (Special version)
+	 * Assumes that all values are allowed by default, and standard contains them
+	 */
+	virtual void serializeLIC(const std::string & fieldName, LICSet & value) = 0;
 
 	template <typename T>
 	void serializeNumericEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const T defaultValue, T & value)

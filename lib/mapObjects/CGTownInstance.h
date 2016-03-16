@@ -245,6 +245,8 @@ public:
 	void clearArmy() const;
 	void addHeroToStructureVisitors(const CGHeroInstance *h, si32 structureInstanceID) const; //hero must be visiting or garrisoned in town
 
+	const CTown * getTown() const ;
+
 	CGTownInstance();
 	virtual ~CGTownInstance();
 
