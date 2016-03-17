@@ -1332,7 +1332,7 @@ void CMapLoaderH3M::readObjects()
 					break; case Obj::RANDOM_DWELLING_FACTION: spec = new CCreGenLeveledInfo();
 				}
 
-				spec->player = PlayerColor(reader.readUInt32());
+				nobj->setOwner(PlayerColor(reader.readUInt32()));
 
 				//216 and 217
 				if (auto castleSpec = dynamic_cast<CCreGenAsCastleInfo *>(spec))
@@ -1356,7 +1356,6 @@ void CMapLoaderH3M::readObjects()
 					lvlSpec->minLevel = std::max(reader.readUInt8(), ui8(1));
 					lvlSpec->maxLevel = std::min(reader.readUInt8(), ui8(7));
 				}
-				nobj->setOwner(spec->player);
 				static_cast<CGDwelling *>(nobj)->info = spec;
 				break;
 			}

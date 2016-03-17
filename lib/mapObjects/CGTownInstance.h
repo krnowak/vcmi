@@ -23,7 +23,6 @@ class DLL_LINKAGE CSpecObjInfo
 {
 public:
 	virtual ~CSpecObjInfo(){};
-	PlayerColor player; //owner
 };
 
 class DLL_LINKAGE CCreGenAsCastleInfo : public virtual CSpecObjInfo
