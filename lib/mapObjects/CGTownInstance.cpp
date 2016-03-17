@@ -1235,7 +1235,10 @@ void CGTownInstance::serializeJsonOptions(JsonSerializeFormat & handler)
 			buildingsLIC.none.insert(id);
 
 		for(const BuildingID id : builtBuildings)
-			buildingsLIC.all.insert(id);
+		{
+			if(id != BuildingID::DEFAULT)
+				buildingsLIC.all.insert(id);
+		}
 
 		handler.serializeLIC("buildings", buildingsLIC);
 

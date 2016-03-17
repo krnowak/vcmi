@@ -82,7 +82,7 @@ JsonStructSerializer::JsonStructSerializer(JsonSerializeHelper & parent, const s
 }
 
 //JsonSerializeFormat::LIC
-JsonSerializeFormat::LIC::LIC(const std::vector<bool> & Standard, const TDecoder & Decoder, const TEncoder & Encoder):
+JsonSerializeFormat::LIC::LIC(const std::vector<bool> & Standard, const TDecoder Decoder, const TEncoder Encoder):
 	standard(Standard), decoder(Decoder), encoder(Encoder)
 {
 	any.resize(standard.size(), false);
@@ -91,7 +91,7 @@ JsonSerializeFormat::LIC::LIC(const std::vector<bool> & Standard, const TDecoder
 }
 
 
-JsonSerializeFormat::LICSet::LICSet(const std::set<si32>& Standard, const TDecoder & Decoder, const TEncoder & Encoder):
+JsonSerializeFormat::LICSet::LICSet(const std::set<si32>& Standard, const TDecoder Decoder, const TEncoder Encoder):
 	standard(Standard), decoder(Decoder), encoder(Encoder)
 {
 

@@ -65,21 +65,21 @@ public:
 
 	struct LIC
 	{
-		LIC(const std::vector<bool> & Standard, const TDecoder & Decoder, const TEncoder & Encoder);
+		LIC(const std::vector<bool> & Standard, const TDecoder Decoder, const TEncoder Encoder);
 
 		const std::vector<bool> & standard;
-		const TDecoder & decoder;
-		const TEncoder & encoder;
+		const TDecoder decoder;
+		const TEncoder encoder;
 		std::vector<bool> all, any, none;
 	};
 
 	struct LICSet
 	{
-		LICSet(const std::set<si32> & Standard, const TDecoder & Decoder, const TEncoder & Encoder);
+		LICSet(const std::set<si32> & Standard, const TDecoder Decoder, const TEncoder Encoder);
 
 		const std::set<si32> & standard;
-		const TDecoder & decoder;
-		const TEncoder & encoder;
+		const TDecoder decoder;
+		const TEncoder encoder;
 		std::set<si32> all, any, none;
 	};
 
