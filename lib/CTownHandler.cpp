@@ -74,7 +74,7 @@ CFaction::~CFaction()
 
 CTown::CTown()
 {
-
+	faction = nullptr;
 }
 
 CTown::~CTown()
