@@ -25,6 +25,49 @@
 std::vector<const CArtifact *> CGTownInstance::merchantArtifacts;
 std::vector<int> CGTownInstance::universitySkills;
 
+void CCreGenAsCastleInfo::serializeJson(JsonSerializeFormat & handler)
+{
+	if(handler.saving)
+	{
+		//todo:
+	}
+	else
+	{
+		//handler.serializeString()
+	}
+}
+
+void CCreGenLeveledInfo::serializeJson(JsonSerializeFormat & handler)
+{
+	handler.serializeNumeric("minLevel", minLevel, ui8(1));
+	handler.serializeNumeric("maxLevel", maxLevel, ui8(7));
+
+	if(!handler.saving)
+	{
+		//todo: safely allow any level > 7
+		vstd::amax(minLevel, 1);
+		vstd::amin(minLevel, 7);
+		vstd::abetween(maxLevel, minLevel, 7);
+	}
+}
+
+void CCreGenLeveledCastleInfo::serializeJson(JsonSerializeFormat & handler)
+{
+	CCreGenAsCastleInfo::serializeJson(handler);
+	CCreGenLeveledInfo::serializeJson(handler);
+}
+
+CGDwelling::CGDwelling():
+	CArmedInstance()
+{
+	info = nullptr;
+}
+
+CGDwelling::~CGDwelling()
+{
+	vstd::clear_pointer(info);
+}
+
 void CGDwelling::initObj()
 {
 	switch(ID)
@@ -56,6 +99,22 @@ void CGDwelling::initObj()
 		assert(0);
 		break;
 	}
+}
+
+void CGDwelling::initRandomObjectInfo()
+{
+	vstd::clear_pointer(info);
+	switch(ID)
+	{
+		case Obj::RANDOM_DWELLING: info = new CCreGenLeveledCastleInfo();
+			break;
+		case Obj::RANDOM_DWELLING_LVL: info = new CCreGenAsCastleInfo();
+			break;
+		case Obj::RANDOM_DWELLING_FACTION: info = new CCreGenLeveledInfo();
+			break;
+	}
+
+	info->owner = this;
 }
 
 void CGDwelling::setPropertyDer(ui8 what, ui32 val)
@@ -319,8 +378,27 @@ void CGDwelling::blockingDialogAnswered(const CGHeroInstance *hero, ui32 answer)
 void CGDwelling::serializeJsonOptions(JsonSerializeFormat & handler)
 {
 	//todo: CGDwelling::serializeJsonOptions
-	if(ID != Obj::WAR_MACHINE_FACTORY && ID != Obj::REFUGEE_CAMP)
+
+	if(!handler.saving)
+		initRandomObjectInfo();
+
+    switch (ID)
+    {
+    case Obj::WAR_MACHINE_FACTORY:
+	case Obj::REFUGEE_CAMP:
+		//do nothing
+    	break;
+	case Obj::RANDOM_DWELLING:
+	case Obj::RANDOM_DWELLING_LVL:
+	case Obj::RANDOM_DWELLING_FACTION:
+		{
+
+		}
+    	//fall though
+    default:
 		serializeJsonOwner(handler);
+    	break;
+    }
 }
 
 int CGTownInstance::getSightRadius() const //returns sight distance
@@ -495,7 +573,7 @@ bool CGTownInstance::hasCapitol() const
 	return hasBuilt(BuildingID::CAPITOL);
 }
 CGTownInstance::CGTownInstance()
-	:IShipyard(this), IMarket(this), town(nullptr), builded(0), destroyed(0), identifier(0), alignment(0xff)
+	:CGDwelling(), IShipyard(this), IMarket(this), town(nullptr), builded(0), destroyed(0), identifier(0), alignment(0xff)
 {
 
 }

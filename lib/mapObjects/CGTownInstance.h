@@ -18,29 +18,44 @@
 
 class CCastleEvent;
 class CGTownInstance;
+class CGDwelling;
 
 class DLL_LINKAGE CSpecObjInfo
 {
 public:
-	virtual ~CSpecObjInfo(){};
+	CSpecObjInfo() = default;
+	virtual ~CSpecObjInfo() = default;
+
+	virtual void serializeJson(JsonSerializeFormat & handler) = 0;
+
+	const CGDwelling * owner;
 };
 
 class DLL_LINKAGE CCreGenAsCastleInfo : public virtual CSpecObjInfo
 {
 public:
+	CCreGenAsCastleInfo() = default;
 	bool asCastle;
-	ui32 identifier;
+	ui32 identifier;//h3m internal identifier
 	ui8 castles[2]; //allowed castles
+	std::string instanceId;//vcmi map instance identifier
+	void serializeJson(JsonSerializeFormat & handler) override;
 };
 
 class DLL_LINKAGE CCreGenLeveledInfo : public virtual CSpecObjInfo
 {
 public:
-	ui8 minLevel, maxLevel; //minimal and maximal level of creature in dwelling: <0, 6>
+	CCreGenLeveledInfo() = default;
+	ui8 minLevel, maxLevel; //minimal and maximal level of creature in dwelling: <1, 7>
+
+	void serializeJson(JsonSerializeFormat & handler) override;
 };
 
 class DLL_LINKAGE CCreGenLeveledCastleInfo : public CCreGenAsCastleInfo, public CCreGenLeveledInfo
 {
+public:
+	CCreGenLeveledCastleInfo() = default;
+	void serializeJson(JsonSerializeFormat & handler) override;
 };
 
 class DLL_LINKAGE CGDwelling : public CArmedInstance
@@ -48,9 +63,13 @@ class DLL_LINKAGE CGDwelling : public CArmedInstance
 public:
 	typedef std::vector<std::pair<ui32, std::vector<CreatureID> > > TCreaturesSet;
 
-	CSpecObjInfo * info; //h3m info about dewlling
+	CSpecObjInfo * info; //random dwelling options; not serialized
 	TCreaturesSet creatures; //creatures[level] -> <vector of alternative ids (base creature and upgrades, creatures amount>
 
+	CGDwelling();
+	virtual ~CGDwelling();
+
+	void initRandomObjectInfo();
 protected:
 	void serializeJsonOptions(JsonSerializeFormat & handler) override;
 

@@ -1323,7 +1323,8 @@ void CMapLoaderH3M::readObjects()
 		case Obj::RANDOM_DWELLING_LVL: //same as castle, fixed level
 		case Obj::RANDOM_DWELLING_FACTION: //level range, fixed faction
 			{
-				nobj = new CGDwelling();
+				auto dwelling = new CGDwelling();
+				nobj = dwelling;
 				CSpecObjInfo * spec = nullptr;
 				switch(objTempl.id)
 				{
@@ -1331,6 +1332,7 @@ void CMapLoaderH3M::readObjects()
 					break; case Obj::RANDOM_DWELLING_LVL: spec = new CCreGenAsCastleInfo();
 					break; case Obj::RANDOM_DWELLING_FACTION: spec = new CCreGenLeveledInfo();
 				}
+				spec->owner = dwelling;
 
 				nobj->setOwner(PlayerColor(reader.readUInt32()));
 
@@ -1356,7 +1358,7 @@ void CMapLoaderH3M::readObjects()
 					lvlSpec->minLevel = std::max(reader.readUInt8(), ui8(1));
 					lvlSpec->maxLevel = std::min(reader.readUInt8(), ui8(7));
 				}
-				static_cast<CGDwelling *>(nobj)->info = spec;
+				dwelling->info = spec;
 				break;
 			}
 		case Obj::QUEST_GUARD:
