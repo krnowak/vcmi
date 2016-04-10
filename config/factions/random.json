@@ -22,7 +22,7 @@
 				"mageGuild5":     { "id" : 4,  "upgrades" : "mageGuild4" },
 
 				"tavern":         { "id" : 5 },
-
+				"shipyard":       { "id" : 6 },
 				"fort":           { "id" : 7 },
 				"citadel":        { "id" : 8,  "upgrades" : "fort" },
 				"castle":         { "id" : 9,  "upgrades" : "citadel" },
