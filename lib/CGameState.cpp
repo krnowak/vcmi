@@ -570,8 +570,29 @@ std::pair<Obj,int> CGameState::pickObject (CGObjectInstance *obj)
 			if (auto info = dynamic_cast<CCreGenAsCastleInfo*>(dwl->info))
 			{
 				faction = rand.nextInt(VLC->townh->factions.size() - 1);
-				if (info->asCastle)
+				if(info->asCastle && info->instanceId != "")
 				{
+					auto iter = map->instanceNames.find(info->instanceId);
+
+					if(iter == map->instanceNames.end())
+						logGlobal->errorStream() << "Map object not found: " << info->instanceId;
+					else
+					{
+						auto elem = iter->second;
+						if(elem->ID==Obj::RANDOM_TOWN)
+						{
+							randomizeObject(elem.get()); //we have to randomize the castle first
+							faction = elem->subID;
+						}
+						else if(elem->ID==Obj::TOWN)
+							faction = elem->subID;
+						else
+							logGlobal->errorStream() << "Map object must be town: " << info->instanceId;
+					}
+				}
+				else if(info->asCastle)
+				{
+
 					for(auto & elem : map->objects)
 					{
 						if(!elem)
@@ -594,12 +615,16 @@ std::pair<Obj,int> CGameState::pickObject (CGObjectInstance *obj)
 				}
 				else
 				{
-					while(!(info->castles[0]&(1<<faction)))
-					{
-						if((faction>7) && (info->castles[1]&(1<<(faction-8))))
-							break;
-						faction = rand.nextInt(GameConstants::F_NUMBER - 1);
-					}
+					std::set<int> temp;
+
+					for(int i = 0; i < info->allowedFactions.size(); i++)
+						if(info->allowedFactions[i])
+							temp.insert(i);
+
+					if(temp.empty())
+						logGlobal->error("Random faction selection failed. Nothing is allowed. Fall back to random.");
+					else
+						faction = *RandomGeneratorUtil::nextItem(temp, rand);
 				}
 			}
 			else // castle alignment fixed

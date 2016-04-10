@@ -27,13 +27,28 @@ std::vector<int> CGTownInstance::universitySkills;
 
 void CCreGenAsCastleInfo::serializeJson(JsonSerializeFormat & handler)
 {
-	if(handler.saving)
+	handler.serializeString("sameAsTown", instanceId);
+
+	if(!handler.saving)
 	{
-		//todo:
+		asCastle = (instanceId != "");
+		allowedFactions.clear();
 	}
-	else
+
+	if(!asCastle)
 	{
-		//handler.serializeString()
+		std::vector<bool> standard;
+		standard.resize(VLC->townh->factions.size(), true);
+
+		JsonSerializeFormat::LIC allowedLIC(standard, &CTownHandler::decodeFaction, &CTownHandler::encodeFaction);
+		allowedLIC.any = allowedFactions;
+
+		handler.serializeLIC("allowedFactions", allowedLIC);
+
+		if(!handler.saving)
+		{
+			allowedFactions = allowedLIC.any;
+		}
 	}
 }
 
@@ -114,7 +129,8 @@ void CGDwelling::initRandomObjectInfo()
 			break;
 	}
 
-	info->owner = this;
+	if(info)
+		info->owner = this;
 }
 
 void CGDwelling::setPropertyDer(ui8 what, ui32 val)

@@ -14,6 +14,7 @@
 
 #include "../JsonNode.h"
 
+//JsonSerializeHelper
 JsonSerializeHelper::JsonSerializeHelper(JsonSerializeHelper && other):
 	owner(other.owner),
 	thisNode(other.thisNode),
@@ -62,6 +63,11 @@ JsonStructSerializer JsonSerializeHelper::enterStruct(const std::string & fieldN
 	return JsonStructSerializer(*this, fieldName);
 }
 
+JsonArraySerializer JsonSerializeHelper::enterArray(const std::string& fieldName)
+{
+	return JsonArraySerializer(*this, fieldName);
+}
+
 //JsonStructSerializer
 JsonStructSerializer::JsonStructSerializer(JsonStructSerializer && other):
 	JsonSerializeHelper(std::move(static_cast<JsonSerializeHelper &>(other)))
@@ -80,6 +86,26 @@ JsonStructSerializer::JsonStructSerializer(JsonSerializeHelper & parent, const s
 {
 
 }
+
+//JsonArraySerializer
+JsonArraySerializer::JsonArraySerializer(JsonStructSerializer && other):
+	JsonSerializeHelper(std::move(static_cast<JsonSerializeHelper &>(other)))
+{
+
+}
+
+JsonArraySerializer::JsonArraySerializer(JsonSerializeFormat & owner_, const std::string & fieldName):
+	JsonSerializeHelper(owner_, &(owner_.current->operator[](fieldName)))
+{
+
+}
+
+JsonArraySerializer::JsonArraySerializer(JsonSerializeHelper & parent, const std::string & fieldName):
+	JsonSerializeHelper(parent, fieldName)
+{
+
+}
+
 
 //JsonSerializeFormat::LIC
 JsonSerializeFormat::LIC::LIC(const std::vector<bool> & Standard, const TDecoder Decoder, const TEncoder Encoder):
@@ -109,7 +135,11 @@ JsonSerializeFormat::JsonSerializeFormat(JsonNode & root_, const bool saving_):
 
 JsonStructSerializer JsonSerializeFormat::enterStruct(const std::string & fieldName)
 {
-	JsonStructSerializer res(*this, fieldName);
-
-	return res;
+	return JsonStructSerializer (*this, fieldName);
 }
+
+JsonArraySerializer JsonSerializeFormat::enterArray(const std::string& fieldName)
+{
+	return JsonArraySerializer(*this, fieldName);
+}
+

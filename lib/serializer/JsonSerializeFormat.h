@@ -13,6 +13,7 @@
 class JsonNode;
 class JsonSerializeFormat;
 class JsonStructSerializer;
+class JsonArraySerializer;
 
 class JsonSerializeHelper: public boost::noncopyable
 {
@@ -25,6 +26,7 @@ public:
 	JsonSerializeFormat * operator->();
 
 	JsonStructSerializer enterStruct(const std::string & fieldName);
+	JsonArraySerializer enterArray(const std::string & fieldName);
 
 protected:
 	JsonSerializeHelper(JsonSerializeFormat & owner_, JsonNode * thisNode_);
@@ -47,6 +49,19 @@ public:
 protected:
 	JsonStructSerializer(JsonSerializeFormat & owner_, const std::string & fieldName);
 	JsonStructSerializer(JsonSerializeHelper & parent, const std::string & fieldName);
+
+	friend class JsonSerializeFormat;
+	friend class JsonSerializeHelper;
+};
+
+class JsonArraySerializer: public JsonSerializeHelper
+{
+public:
+	JsonArraySerializer(JsonStructSerializer && other);
+
+protected:
+	JsonArraySerializer(JsonSerializeFormat & owner_, const std::string & fieldName);
+	JsonArraySerializer(JsonSerializeHelper & parent, const std::string & fieldName);
 
 	friend class JsonSerializeFormat;
 	friend class JsonSerializeHelper;
@@ -99,6 +114,7 @@ public:
 	};
 
 	JsonStructSerializer enterStruct(const std::string & fieldName);
+	JsonArraySerializer enterArray(const std::string & fieldName);
 
 	template <typename T>
 	void serializeBool(const std::string & fieldName, T & value, const T trueValue, const T falseValue)
@@ -209,5 +225,6 @@ protected:
 private:
 	friend class JsonSerializeHelper;
 	friend class JsonStructSerializer;
+	friend class JsonArraySerializer;
 };
 

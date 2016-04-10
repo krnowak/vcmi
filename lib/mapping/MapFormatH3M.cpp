@@ -1339,12 +1339,24 @@ void CMapLoaderH3M::readObjects()
 				//216 and 217
 				if (auto castleSpec = dynamic_cast<CCreGenAsCastleInfo *>(spec))
 				{
-					castleSpec->identifier =  reader.readUInt32();
+					castleSpec->instanceId = "";
+					castleSpec->identifier = reader.readUInt32();
 					if(!castleSpec->identifier)
 					{
 						castleSpec->asCastle = false;
-						castleSpec->castles[0] = reader.readUInt8();
-						castleSpec->castles[1] = reader.readUInt8();
+						const int MASK_SIZE = 8;
+						ui8 mask[2];
+						mask[0] = reader.readUInt8();
+						mask[1] = reader.readUInt8();
+
+						castleSpec->allowedFactions.clear();
+						castleSpec->allowedFactions.resize(VLC->townh->factions.size(), false);
+
+						for(int i = 0; i < MASK_SIZE; i++)
+							castleSpec->allowedFactions[i] = ((mask[0] & (1 << i))>0);
+
+						for(int i = 0; i < (GameConstants::F_NUMBER-MASK_SIZE); i++)
+							castleSpec->allowedFactions[i+MASK_SIZE] = ((mask[1] & (1 << i))>0);
 					}
 					else
 					{

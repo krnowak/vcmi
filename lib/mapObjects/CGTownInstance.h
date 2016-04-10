@@ -37,7 +37,9 @@ public:
 	CCreGenAsCastleInfo() = default;
 	bool asCastle;
 	ui32 identifier;//h3m internal identifier
-	ui8 castles[2]; //allowed castles
+
+	std::vector<bool> allowedFactions;
+
 	std::string instanceId;//vcmi map instance identifier
 	void serializeJson(JsonSerializeFormat & handler) override;
 };
