@@ -23,54 +23,41 @@
 
 #include "MapComparer.h"
 
-
 static const int TEST_RANDOM_SEED = 1337;
 
-static std::unique_ptr<CMap> initialMap;
-
-class CMapTestFixture
+BOOST_AUTO_TEST_CASE(CMapFormatVCMI_RandomMap)
 {
-public:
-	CMapTestFixture()
-	{
-		CMapGenOptions opt;
+	logGlobal->info("CMapFormatVCMI_RandomMap start");
+	BOOST_TEST_CHECKPOINT("CMapFormatVCMI_RandomMap start");
+	std::unique_ptr<CMap> initialMap;
 
-		opt.setHeight(CMapHeader::MAP_SIZE_MIDDLE);
-		opt.setWidth(CMapHeader::MAP_SIZE_MIDDLE);
-		opt.setHasTwoLevels(true);
-		opt.setPlayerCount(4);
+	CMapGenOptions opt;
 
-		opt.setPlayerTypeForStandardPlayer(PlayerColor(0), EPlayerType::HUMAN);
-		opt.setPlayerTypeForStandardPlayer(PlayerColor(1), EPlayerType::AI);
-		opt.setPlayerTypeForStandardPlayer(PlayerColor(2), EPlayerType::AI);
-		opt.setPlayerTypeForStandardPlayer(PlayerColor(3), EPlayerType::AI);
+	opt.setHeight(CMapHeader::MAP_SIZE_MIDDLE);
+	opt.setWidth(CMapHeader::MAP_SIZE_MIDDLE);
+	opt.setHasTwoLevels(true);
+	opt.setPlayerCount(4);
 
-		CMapGenerator gen;
+	opt.setPlayerTypeForStandardPlayer(PlayerColor(0), EPlayerType::HUMAN);
+	opt.setPlayerTypeForStandardPlayer(PlayerColor(1), EPlayerType::AI);
+	opt.setPlayerTypeForStandardPlayer(PlayerColor(2), EPlayerType::AI);
+	opt.setPlayerTypeForStandardPlayer(PlayerColor(3), EPlayerType::AI);
 
-		initialMap = gen.generate(&opt, TEST_RANDOM_SEED);
-		initialMap->name = "Test";
-	};
-	~CMapTestFixture()
-	{
-		initialMap.reset();
-	};
-};
+	CMapGenerator gen;
 
-BOOST_GLOBAL_FIXTURE(CMapTestFixture);
+	initialMap = gen.generate(&opt, TEST_RANDOM_SEED);
+	initialMap->name = "Test";
+	BOOST_TEST_CHECKPOINT("CMapFormatVCMI_RandomMap generated");
 
-BOOST_AUTO_TEST_CASE(CMapFormatVCMI_Simple)
-{
-	logGlobal->info("CMapFormatVCMI_Simple start");
-	BOOST_TEST_CHECKPOINT("CMapFormatVCMI_Simple start");
 	CMemoryBuffer serializeBuffer;
 	{
 		CMapSaverJson saver(&serializeBuffer);
 		saver.saveMap(initialMap);
 	}
-	BOOST_TEST_CHECKPOINT("CMapFormatVCMI_Simple serialized");
+	BOOST_TEST_CHECKPOINT("CMapFormatVCMI_RandomMap serialized");
 	#if 1
 	{
-		auto path = VCMIDirs::get().userDataPath()/"test.vmap";
+		auto path = VCMIDirs::get().userDataPath()/"test_random.vmap";
 		boost::filesystem::remove(path);
 		boost::filesystem::ofstream tmp(path, boost::filesystem::ofstream::binary);
 
@@ -80,7 +67,7 @@ BOOST_AUTO_TEST_CASE(CMapFormatVCMI_Simple)
 
 		logGlobal->infoStream() << "Test map has been saved to " << path;
 	}
-	BOOST_TEST_CHECKPOINT("CMapFormatVCMI_Simple saved");
+	BOOST_TEST_CHECKPOINT("CMapFormatVCMI_RandomMap saved");
 
 	#endif // 1
 
@@ -93,5 +80,13 @@ BOOST_AUTO_TEST_CASE(CMapFormatVCMI_Simple)
 		c(serialized, initialMap);
 	}
 
-	logGlobal->info("CMapFormatVCMI_Simple finish");
+	logGlobal->info("CMapFormatVCMI_RandomMap finish");
+}
+
+BOOST_AUTO_TEST_CASE(CMapFormatVCMI_ObjectPropertyTestMap)
+{
+	logGlobal->info("CMapFormatVCMI_ObjectPropertyTestMap start");
+	const std::unique_ptr<CMap> originalMap = CMapService::loadMap("test/ObjectPropertyTest");
+
+	logGlobal->info("CMapFormatVCMI_ObjectPropertyTestMap finish");
 }
