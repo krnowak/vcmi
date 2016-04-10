@@ -785,9 +785,9 @@ void CTownHandler::loadRandomFaction()
 {
 	static const ResourceID randomFactionPath("config/factions/random.json");
 
-	const JsonNode randomFactionJson(randomFactionPath);
-
-	loadBuildings(randomTown, randomFactionJson["town"]["buildings"]);
+	JsonNode randomFactionJson(randomFactionPath);
+	randomFactionJson.setMeta("core", true);
+	loadBuildings(randomTown, randomFactionJson["random"]["town"]["buildings"]);
 }
 
 void CTownHandler::loadCustom()
