@@ -13,6 +13,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../lib/filesystem/CMemoryBuffer.h"
+#include "../lib/filesystem/Filesystem.h"
 
 #include "../lib/mapping/CMap.h"
 #include "../lib/rmg/CMapGenOptions.h"
@@ -83,10 +84,51 @@ BOOST_AUTO_TEST_CASE(CMapFormatVCMI_RandomMap)
 	logGlobal->info("CMapFormatVCMI_RandomMap finish");
 }
 
+static JsonNode getFromArchive(CZipLoader & archive, const std::string & archiveFilename)
+{
+	ResourceID resource(archiveFilename, EResType::TEXT);
+
+	if(!archive.existsResource(resource))
+		throw new std::runtime_error(archiveFilename+" not found");
+
+	auto data = archive.load(resource)->readAll();
+
+	JsonNode res(reinterpret_cast<char*>(data.first.get()), data.second);
+
+	return std::move(res);
+}
+
 BOOST_AUTO_TEST_CASE(CMapFormatVCMI_ObjectPropertyTestMap)
 {
 	logGlobal->info("CMapFormatVCMI_ObjectPropertyTestMap start");
-	const std::unique_ptr<CMap> originalMap = CMapService::loadMap("test/ObjectPropertyTest");
+
+	std::unique_ptr<CInputStream> originalDataStream = CResourceHandler::get()->load(ResourceID("test/ObjectPropertyTest", EResType::MAP));
+	std::shared_ptr<CIOApi> originalDataIO(new CProxyROIOApi(originalDataStream.get()));
+	CZipLoader originalDataLoader("", "_", originalDataIO);
+
+	const JsonNode expectedHeader = getFromArchive(originalDataLoader, "header.json");
+	const JsonNode expectedObjects = getFromArchive(originalDataLoader, "objects.json");
+	const JsonNode expectedSurface = getFromArchive(originalDataLoader, "surface_terrain.json");
+
+	std::unique_ptr<CMap> originalMap = CMapService::loadMap("test/ObjectPropertyTest");
+
+	CMemoryBuffer serializeBuffer;
+	{
+		CMapSaverJson saver(&serializeBuffer);
+		saver.saveMap(originalMap);
+	}
+
+	{
+		auto path = VCMIDirs::get().userDataPath()/"test_object_property.vmap";
+		boost::filesystem::remove(path);
+		boost::filesystem::ofstream tmp(path, boost::filesystem::ofstream::binary);
+
+		tmp.write((const char *)serializeBuffer.getBuffer().data(),serializeBuffer.getSize());
+		tmp.flush();
+		tmp.close();
+
+		logGlobal->infoStream() << "Test map has been saved to " << path;
+	}
 
 	logGlobal->info("CMapFormatVCMI_ObjectPropertyTestMap finish");
 }
