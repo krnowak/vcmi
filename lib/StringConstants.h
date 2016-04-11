@@ -53,7 +53,7 @@ namespace NSecondarySkill
 		"sorcery",      "resistance",   "firstAid"
 	};
 
-	const std::string levels [4] =
+	const std::vector<std::string> levels =
 	{
 	    "none", "basic", "advanced", "expert"
 	};

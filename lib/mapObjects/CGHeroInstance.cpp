@@ -1506,7 +1506,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 	CCreatureSet::serializeJson(handler, "army");
 	handler.serializeBool<ui8>("tightFormation", formation, 1, 0);
 
-	CArtifactSet::serializeJson(handler, "artifacts");
+	CArtifactSet::serializeJson(handler, "artifacts");//todo:CArtifactSet::serializeJson
 
 	handler.serializeString("biography", biography);
 	handler.serializeNumeric("experience", exp);
@@ -1556,10 +1556,78 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 		}
 	}
 
+	//secondary skills
 	{
-		auto secondarySkills = handler.enterStruct("secondarySkills");
+		if(handler.saving)
+		{
+			//does hero have default skills?
+			bool defaultSkills = false;
+			bool normalSkills = false;
+			for(const auto & p : secSkills)
+			{
+				if(p.first == SecondarySkill(SecondarySkill::DEFAULT))
+					defaultSkills = true;
+				else
+					normalSkills = true;
+			}
+
+			if(defaultSkills && normalSkills)
+				logGlobal->error("Mixed default and normal secondary skills");
+
+			//in json default skills means no field/null
+			if(!defaultSkills)
+			{
+				//enter structure here as handler initialize it
+				auto secondarySkills = handler.enterStruct("secondarySkills");
+
+				for(auto & p : secSkills)
+				{
+					const si32 rawId = p.first.num;
+
+					if(rawId < 0 || rawId >= GameConstants::SKILL_QUANTITY)
+						logGlobal->errorStream() << "Invalid secondary skill " << rawId;
+
+					handler.serializeNumericEnum<ui8>(NSecondarySkill::names[rawId], NSecondarySkill::levels, 0, p.second);
+				}
+			}
+		}
+		else
+		{
+			secSkills.clear();
+			if(handler.getCurrent().getType() == JsonNode::DATA_NULL)
+			{
+				secSkills.push_back(std::pair<SecondarySkill,ui8>(SecondarySkill::DEFAULT, -1));
+			}
+			else
+			{
+				auto secondarySkills = handler.enterStruct("secondarySkills");
+
+				const JsonNode & skillMap = handler.getCurrent();
+
+				for(const auto & p : skillMap.Struct())
+				{
+					const std::string id = p.first;
+					const std::string levelId =  p.second.String();
+
+					const int rawId = vstd::find_pos(NSecondarySkill::names, id);
+					if(rawId < 0)
+					{
+						logGlobal->errorStream() << "Invalid secondary skill " << id;
+						continue;
+					}
 
 
+					const int level = vstd::find_pos(NSecondarySkill::levels, levelId);
+					if(level < 0)
+					{
+						logGlobal->errorStream() << "Invalid secondary skill level" << levelId;
+						continue;
+					}
+
+					secSkills.push_back(std::pair<SecondarySkill,ui8>(SecondarySkill(rawId), level));
+				}
+			}
+		}
 	}
 
 
