@@ -26,6 +26,7 @@
 #include "../mapping/CMap.h"
 #include "CGTownInstance.h"
 #include "../serializer/JsonSerializeFormat.h"
+#include "../StringConstants.h"
 
 ///helpers
 static void showInfoDialog(const PlayerColor playerID, const ui32 txtID, const ui16 soundID)
@@ -1529,11 +1530,38 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 			patrol.patrolRadius = (rawPatrolRadius > NO_PATROLING) ? rawPatrolRadius : 0;
 		}
 	}
-	handler.serializeIntId("portrait", &VLC->heroh->decodeHero, &VLC->heroh->encodeHero, UNINITIALIZED_PORTRAIT, portrait);
+	handler.serializeId<si32>("portrait", &VLC->heroh->decodeHero, &VLC->heroh->encodeHero, UNINITIALIZED_PORTRAIT, portrait);
 
-	//primary skills
+	{
+		auto primarySkills = handler.enterStruct("primarySkills");
 
-	//secondary skills
+		if(handler.saving)
+		{
+			for(int i = 0; i < GameConstants::PRIMARY_SKILLS; ++i)
+			{
+				int value = valOfBonuses(Selector::typeSubtype(Bonus::PRIMARY_SKILL, i).And(Selector::sourceType(Bonus::HERO_BASE_SKILL)));
+
+				handler.serializeNumeric<int>(PrimarySkill::names[i], value, 0);
+			}
+		}
+		else
+		{
+			for(int i = 0; i < GameConstants::PRIMARY_SKILLS; ++i)
+			{
+				int value = 0;
+				handler.serializeNumeric<int>(PrimarySkill::names[i], value, 0);
+				if(value != 0)
+					pushPrimSkill(static_cast<PrimarySkill::PrimarySkill>(i), value);
+			}
+		}
+	}
+
+	{
+		auto secondarySkills = handler.enterStruct("secondarySkills");
+
+
+	}
+
 
 	handler.serializeBool<ui8>("female", sex, 1, 0, 0xFF);
 

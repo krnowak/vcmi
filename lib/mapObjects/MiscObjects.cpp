@@ -1436,8 +1436,7 @@ void CGArtifact::serializeJsonOptions(JsonSerializeFormat& handler)
 		const Bonus * b = storedArtifact->getBonusLocalFirst(Selector::type(Bonus::SPELL));
 		SpellID spellId(b->subtype);
 
-		std::string spell = SpellID(b->subtype).toSpell()->identifier;
-		handler.serializeString("spell", spell);
+		handler.serializeId("spell", &CSpellHandler::decodeSpell, &CSpellHandler::encodeSpell, SpellID(SpellID::MAGIC_ARROW), spellId);
 	}
 }
 

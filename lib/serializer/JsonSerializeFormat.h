@@ -203,14 +203,12 @@ public:
 	template <typename T>
 	void serializeId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const T & defaultValue, T & value)
 	{
-		const si32 tempDefault = defaultValue.num;
-		si32 tempValue = value.num;
+		const si32 tempDefault = si32(defaultValue);
+		si32 tempValue = si32(value);
 		serializeIntId(fieldName, decoder, encoder, tempDefault, tempValue);
 		if(!saving)
 			value = T(tempValue);
 	}
-
-	virtual void serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value) = 0;
 
 protected:
 	JsonNode * root;
@@ -219,9 +217,8 @@ protected:
 	JsonSerializeFormat(JsonNode & root_, const bool saving_);
 
 	virtual void serializeFloat(const std::string & fieldName, double & value, const double & defaultValue) = 0;
-
 	virtual void serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value) = 0;
-
+	virtual void serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value) = 0;
 private:
 	friend class JsonSerializeHelper;
 	friend class JsonStructSerializer;
