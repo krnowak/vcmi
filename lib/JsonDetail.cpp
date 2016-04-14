@@ -491,7 +491,40 @@ bool JsonParser::extractFloat(JsonNode &node)
 			pos++;
 		}
 	}
-	//TODO: exponential part
+
+	if(input[pos] == 'e')
+	{
+		//extract exponential part
+		pos++;
+
+		bool powerNegative = false;
+		double power = 0;
+
+		if(input[pos] == '-')
+		{
+			pos++;
+			powerNegative = true;
+		}
+		else if(input[pos] == '+')
+		{
+			pos++;
+		}
+
+		if (input[pos] < '0' || input[pos] > '9')
+			return error("Exponential part expected!");
+
+		while (input[pos] >= '0' && input[pos] <= '9')
+		{
+			power = power*10 + (input[pos]-'0');
+			pos++;
+		}
+
+		if(powerNegative)
+			power = -power;
+
+		result *= std::pow(10, power);
+	}
+
 	if (negative)
 		result = -result;
 
