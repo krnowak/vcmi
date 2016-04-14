@@ -103,15 +103,26 @@ void JsonSerializer::serializeString(const std::string & fieldName, std::string 
 
 void JsonSerializer::writeLICPart(const std::string & fieldName, const std::string & partName, const TEncoder & encoder, const std::vector<bool> & data)
 {
-	auto & target = current->operator[](fieldName)[partName].Vector();
+	std::vector<std::string> buf;
+	buf.reserve(data.size());
+
 	for(si32 idx = 0; idx < data.size(); idx++)
 	{
 		if(data[idx])
 		{
-			JsonNode val(JsonNode::DATA_STRING);
-			val.String() = encoder(idx);
-			target.push_back(std::move(val));
+			buf.push_back(encoder(idx));
 		}
+	}
+
+	std::sort(buf.begin(), buf.end());
+
+	auto & target = current->operator[](fieldName)[partName].Vector();
+
+	for(auto & s : buf)
+	{
+		JsonNode val(JsonNode::DATA_STRING);
+		val.String() = s;
+		target.push_back(std::move(val));
 	}
 }
 
