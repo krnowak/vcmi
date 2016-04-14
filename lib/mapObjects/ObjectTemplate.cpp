@@ -186,6 +186,7 @@ void ObjectTemplate::readMap(CBinaryReader & reader)
 void ObjectTemplate::readJson(const JsonNode &node, const bool withTerrain)
 {
 	animationFile = node["animation"].String();
+	editorAnimationFile = node["editorAnimation"].String();
 
 	const JsonVector & visitDirs = node["visitableFrom"].Vector();
 	if (!visitDirs.empty())
@@ -258,6 +259,7 @@ void ObjectTemplate::readJson(const JsonNode &node, const bool withTerrain)
 void ObjectTemplate::writeJson(JsonNode & node, const bool withTerrain) const
 {
 	node["animation"].String() = animationFile;
+	node["editorAnimation"].String() = editorAnimationFile;
 
 	if(visitDir != 0x0 && isVisitable())
 	{
