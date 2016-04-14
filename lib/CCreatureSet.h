@@ -221,7 +221,7 @@ public:
 		h & stacks & formation;
 	}
 
-	void serializeJson(JsonSerializeFormat & handler, const std::string & fieldName);
+	void serializeJson(JsonSerializeFormat & handler, const std::string & fieldName, const boost::optional<int> fixedSize = boost::none);
 
 	operator bool() const
 	{

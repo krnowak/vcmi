@@ -1865,7 +1865,7 @@ void CGGarrison::serializeJsonOptions(JsonSerializeFormat& handler)
 {
 	handler.serializeBool("removableUnits", removableUnits);
 	serializeJsonOwner(handler);
-	CCreatureSet::serializeJson(handler, "army");
+	CCreatureSet::serializeJson(handler, "army", 7);
 }
 
 void CGMagi::initObj()
