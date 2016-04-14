@@ -60,17 +60,17 @@ void JsonWriter::writeEntry(JsonVector::const_iterator entry)
 
 void JsonWriter::writeString(const std::string &string)
 {
-	static const std::string escaped = "\"\\\b\f\n\r\t";
-	
-	static const std::array<char, 7> escaped_code = {'\"', '\\', 'b', 'f', 'n', 'r', 't'};
-	
+	static const std::string escaped = "\"\\\b\f\n\r\t/";
+
+	static const std::array<char, 8> escaped_code = {'\"', '\\', 'b', 'f', 'n', 'r', 't', '/'};
+
 	out <<'\"';
 	size_t pos=0, start=0;
 	for (; pos<string.size(); pos++)
 	{
-		//we need to check if special character was been already escaped		
-		if((string[pos] == '\\') 
-			&& (pos+1 < string.size()) 
+		//we need to check if special character was been already escaped
+		if((string[pos] == '\\')
+			&& (pos+1 < string.size())
 			&& (std::find(escaped_code.begin(), escaped_code.end(), string[pos+1]) != escaped_code.end()) )
 		{
 			pos++; //write unchanged, next simbol also checked
@@ -84,7 +84,7 @@ void JsonWriter::writeString(const std::string &string)
 				out.write(string.data()+start, pos - start);
 				out << '\\' << escaped_code[escapedPos];
 				start = pos+1;
-			}			
+			}
 		}
 
 	}
@@ -252,6 +252,7 @@ bool JsonParser::extractEscaping(std::string &str)
 		break; case 'n': str += '\n';
 		break; case 'r': str += '\r';
 		break; case 't': str += '\t';
+		break; case '/': str += '/';
 		break; default: return error("Unknown escape sequence!", true);
 	};
 	return true;
@@ -515,11 +516,11 @@ bool JsonParser::error(const std::string &message, bool warning)
 
 static const std::unordered_map<std::string, JsonNode::JsonType> stringToType =
 {
-	{"null",   JsonNode::DATA_NULL},   
+	{"null",   JsonNode::DATA_NULL},
 	{"boolean", JsonNode::DATA_BOOL},
-	{"number", JsonNode::DATA_FLOAT},  
+	{"number", JsonNode::DATA_FLOAT},
 	{"string",  JsonNode::DATA_STRING},
-	{"array",  JsonNode::DATA_VECTOR}, 
+	{"array",  JsonNode::DATA_VECTOR},
 	{"object",  JsonNode::DATA_STRUCT}
 };
 
@@ -612,7 +613,7 @@ namespace
 			{
 				return validator.makeErrorMessage("Unknown type in schema:" + typeName);
 			}
-			
+
 			JsonNode::JsonType type = it->second;
 			if(type != data.getType() && data.getType() != JsonNode::DATA_NULL)
 				return validator.makeErrorMessage("Type mismatch! Expected " + schema.String());
@@ -969,7 +970,7 @@ namespace
 				return testAnimation(node.String().substr(0, node.String().find(':')), node.meta);
 			return "Image file \"" + node.String() + "\" was not found";
 		}
-		
+
 		std::string videoFile(const JsonNode & node)
 		{
 			TEST_FILE(node.meta, "Video/", node.String(), EResType::VIDEO);
