@@ -408,9 +408,9 @@ void CGDwelling::serializeJsonOptions(JsonSerializeFormat & handler)
 	case Obj::RANDOM_DWELLING_LVL:
 	case Obj::RANDOM_DWELLING_FACTION:
 		{
-
+			info->serializeJson(handler);
 		}
-    	//fall though
+    	//fall through
     default:
 		serializeJsonOwner(handler);
     	break;
