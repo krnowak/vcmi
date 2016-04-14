@@ -118,6 +118,13 @@ BOOST_AUTO_TEST_CASE(CMapFormatVCMI_ObjectPropertyTestMap)
 		saver.saveMap(originalMap);
 	}
 
+	std::shared_ptr<CIOApi> actualDataIO(new CProxyROIOApi(&serializeBuffer));
+	CZipLoader actualDataLoader("", "_", actualDataIO);
+
+	const JsonNode actualHeader = getFromArchive(actualDataLoader, "header.json");
+	const JsonNode actualObjects = getFromArchive(actualDataLoader, "objects.json");
+	const JsonNode actualSurface = getFromArchive(actualDataLoader, "surface_terrain.json");
+
 	{
 		auto path = VCMIDirs::get().userDataPath()/"test_object_property.vmap";
 		boost::filesystem::remove(path);
@@ -128,6 +135,23 @@ BOOST_AUTO_TEST_CASE(CMapFormatVCMI_ObjectPropertyTestMap)
 		tmp.close();
 
 		logGlobal->infoStream() << "Test map has been saved to " << path;
+	}
+
+    for(const auto & p : expectedHeader.Struct())
+	{
+		if(!vstd::contains(actualHeader.Struct(), p.first))
+			BOOST_ERROR("Header field missing "+p.first);
+		else if(p.second != actualHeader[p.first])
+			BOOST_ERROR("Header field differ "+p.first);
+	}
+
+    for(const auto & p : expectedObjects.Struct())
+	{
+		if(!vstd::contains(actualObjects.Struct(), p.first))
+			BOOST_ERROR("Map object missing "+p.first);
+
+		else if(p.second != actualObjects[p.first])
+			BOOST_ERROR("Map object differ "+p.first);
 	}
 
 	logGlobal->info("CMapFormatVCMI_ObjectPropertyTestMap finish");
