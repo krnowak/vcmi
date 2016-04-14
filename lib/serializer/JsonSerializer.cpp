@@ -116,13 +116,16 @@ void JsonSerializer::writeLICPart(const std::string & fieldName, const std::stri
 
 	std::sort(buf.begin(), buf.end());
 
-	auto & target = current->operator[](fieldName)[partName].Vector();
-
-	for(auto & s : buf)
+	if(!buf.empty())
 	{
-		JsonNode val(JsonNode::DATA_STRING);
-		val.String() = s;
-		target.push_back(std::move(val));
+		auto & target = current->operator[](fieldName)[partName].Vector();
+
+		for(auto & s : buf)
+		{
+			JsonNode val(JsonNode::DATA_STRING);
+			val.String() = s;
+			target.push_back(std::move(val));
+		}
 	}
 }
 
