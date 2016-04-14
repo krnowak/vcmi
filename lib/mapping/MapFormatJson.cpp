@@ -196,7 +196,7 @@ void CMapFormatJson::serializeHeader(JsonSerializeFormat & handler)
 {
 	handler.serializeString("name", mapHeader->name);
 	handler.serializeString("description", mapHeader->description);
-	handler.serializeNumeric("heroLevelLimit", mapHeader->levelLimit);
+	handler.serializeNumeric("heroLevelLimit", mapHeader->levelLimit, 0);
 
 	//todo: support arbitrary percentage
 	handler.serializeNumericEnum("difficulty", HeaderDetail::difficultyMap, HeaderDetail::difficultyDefault, mapHeader->difficulty);
