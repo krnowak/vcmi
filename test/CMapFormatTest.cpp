@@ -98,19 +98,56 @@ static JsonNode getFromArchive(CZipLoader & archive, const std::string & archive
 	return std::move(res);
 }
 
+
+static void addToArchive(CZipSaver & saver, const JsonNode & data, const std::string & filename)
+{
+	std::ostringstream out;
+	out << data;
+	out.flush();
+
+	{
+		auto s = out.str();
+		std::unique_ptr<COutputStream> stream = saver.addFile(filename);
+
+		if(stream->write((const ui8*)s.c_str(), s.size()) != s.size())
+			throw new std::runtime_error("CMapSaverJson::saveHeader() zip compression failed.");
+	}
+}
+
 BOOST_AUTO_TEST_CASE(CMapFormatVCMI_ObjectPropertyTestMap)
 {
 	logGlobal->info("CMapFormatVCMI_ObjectPropertyTestMap start");
 
-	std::unique_ptr<CInputStream> originalDataStream = CResourceHandler::get()->load(ResourceID("test/ObjectPropertyTest", EResType::MAP));
-	std::shared_ptr<CIOApi> originalDataIO(new CProxyROIOApi(originalDataStream.get()));
-	CZipLoader originalDataLoader("", "_", originalDataIO);
+	static const std::string MAP_DATA_PATH = "test/ObjectPropertyTest/";
 
-	const JsonNode expectedHeader = getFromArchive(originalDataLoader, "header.json");
-	const JsonNode expectedObjects = getFromArchive(originalDataLoader, "objects.json");
-	const JsonNode expectedSurface = getFromArchive(originalDataLoader, "surface_terrain.json");
+	const JsonNode expectedHeader(ResourceID(MAP_DATA_PATH+"header.json"));
+	const JsonNode expectedObjects(ResourceID(MAP_DATA_PATH+"objects.json"));
+	const JsonNode expectedSurface(ResourceID(MAP_DATA_PATH+"surface_terrain.json"));
+	const JsonNode expectedUnderground(ResourceID(MAP_DATA_PATH+"underground_terrain.json"));
 
-	std::unique_ptr<CMap> originalMap = CMapService::loadMap("test/ObjectPropertyTest");
+	std::unique_ptr<CMap> originalMap;
+	{
+		CMemoryBuffer initialBuffer;
+
+		std::shared_ptr<CIOApi> originalDataIO(new CProxyIOApi(&initialBuffer));
+
+		{
+			CZipSaver initialSaver(originalDataIO, "_");
+
+			addToArchive(initialSaver, expectedHeader, "header.json");
+			addToArchive(initialSaver, expectedObjects, "objects.json");
+			addToArchive(initialSaver, expectedSurface, "surface_terrain.json");
+			addToArchive(initialSaver, expectedUnderground, "underground_terrain.json");
+		}
+
+		initialBuffer.seek(0);
+
+		{
+			CMapLoaderJson initialLoader(&initialBuffer);
+
+			originalMap = initialLoader.loadMap();
+		}
+	}
 
 	CMemoryBuffer serializeBuffer;
 	{

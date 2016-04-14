@@ -1510,7 +1510,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 
 	handler.serializeString("biography", biography);
 	//FIXME: JsonNode need int64 support
-	//handler.serializeNumeric("experience", exp);
+	handler.serializeNumeric("experience", exp);
 	handler.serializeString("name", name);
 	handler.serializeBool<ui8>("female", sex, 1, 0, 0xFF);
 
