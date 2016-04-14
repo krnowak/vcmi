@@ -43,6 +43,11 @@ void JsonSerializer::serializeFloat(const std::string & fieldName, double & valu
 		current->operator[](fieldName).Float() = value;
 }
 
+void JsonSerializer::serializeFloat(const std::string & fieldName, double & value)
+{
+	current->operator[](fieldName).Float() = value;
+}
+
 void JsonSerializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value)
 {
 	if(defaultValue != value)

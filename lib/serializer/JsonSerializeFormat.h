@@ -183,13 +183,13 @@ public:
 	void serializeNumeric(const std::string & fieldName, T & value)
 	{
 		double temp = value;
-		serializeFloat(fieldName, temp, 0);
+		serializeFloat(fieldName, temp);
 		if(!saving)
 			value = temp;
 	};
 
-	template <typename T>
-	void serializeNumeric(const std::string & fieldName, T & value, const T & defaultValue)
+	template <typename T, typename U>
+	void serializeNumeric(const std::string & fieldName, T & value, const U & defaultValue)
 	{
 		double tempDefault = defaultValue;
 		double temp = value;
@@ -217,6 +217,8 @@ protected:
 	JsonSerializeFormat(JsonNode & root_, const bool saving_);
 
 	virtual void serializeFloat(const std::string & fieldName, double & value, const double & defaultValue) = 0;
+	virtual void serializeFloat(const std::string & fieldName, double & value) = 0;
+
 	virtual void serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value) = 0;
 	virtual void serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value) = 0;
 private:

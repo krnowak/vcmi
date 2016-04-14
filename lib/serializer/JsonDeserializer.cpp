@@ -51,6 +51,16 @@ void JsonDeserializer::serializeFloat(const std::string & fieldName, double & va
 		value = data.Float();
 }
 
+void JsonDeserializer::serializeFloat(const std::string & fieldName, double & value)
+{
+	const JsonNode & data = current->operator[](fieldName);
+
+	if(data.getType() != JsonNode::DATA_FLOAT)
+		value = 0;//todo: report error
+	else
+		value = data.Float();
+}
+
 void JsonDeserializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value)
 {
 	const std::string & valueName = current->operator[](fieldName).String();
