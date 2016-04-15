@@ -53,12 +53,12 @@ public:
 	CQuest(){missionType = MISSION_NONE;}; //default constructor
 	virtual ~CQuest(){};
 
+	virtual void addReplacements(MetaString &out, const std::string &base) const;
 	virtual bool checkQuest (const CGHeroInstance * h) const; //determines whether the quest is complete or not
 	virtual void getVisitText (MetaString &text, std::vector<Component> &components, bool isCustom, bool FirstVisit, const CGHeroInstance * h = nullptr) const;
 	virtual void getCompletionText (MetaString &text, std::vector<Component> &components, bool isCustom, const CGHeroInstance * h = nullptr) const;
 	virtual void getRolloverText (MetaString &text, bool onHover) const; //hover or quest log entry
 	virtual void completeQuest (const CGHeroInstance * h) const {};
-	virtual void addReplacements(MetaString &out, const std::string &base) const;
 
 	bool operator== (const CQuest & quest) const
 	{
@@ -80,6 +80,8 @@ public:
 			completedOption = 1;
 		}
 	}
+
+	void serializeJson(JsonSerializeFormat & handler, const std::string & fieldName);
 };
 
 class DLL_LINKAGE IQuestObject
@@ -88,7 +90,7 @@ public:
 	CQuest * quest;
 
 	IQuestObject(): quest(new CQuest()){};
-	virtual ~IQuestObject() {};
+	virtual ~IQuestObject() {delete quest;};
 	virtual void getVisitText (MetaString &text, std::vector<Component> &components, bool isCustom, bool FirstVisit, const CGHeroInstance * h = nullptr) const;
 	virtual bool checkQuest (const CGHeroInstance * h) const;
 
@@ -133,6 +135,8 @@ protected:
 	static const int OBJPROP_VISITED = 10;
 
 	void setPropertyDer(ui8 what, ui32 val) override;
+
+	void serializeJsonOptions(JsonSerializeFormat & handler) override;
 };
 
 class DLL_LINKAGE CGQuestGuard : public CGSeerHut
@@ -146,6 +150,8 @@ public:
 	{
 		h & static_cast<CGSeerHut&>(*this);
 	}
+protected:
+	void serializeJsonOptions(JsonSerializeFormat & handler) override;
 };
 
 class DLL_LINKAGE CGKeys : public CGObjectInstance //Base class for Keymaster and guards

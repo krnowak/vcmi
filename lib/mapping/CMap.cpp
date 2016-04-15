@@ -556,6 +556,8 @@ void CMap::eraseArtifactInstance(CArtifactInstance * art)
 void CMap::addQuest(CGObjectInstance * quest)
 {
 	auto q = dynamic_cast<IQuestObject *>(quest);
+	if(q == nullptr)
+		throw std::runtime_error("Invalid quest instance");
 	q->quest->qid = quests.size();
 	quests.push_back(q->quest);
 }
@@ -576,14 +578,24 @@ void CMap::addNewObject(CGObjectInstance * obj)
     instanceNames[obj->instanceName] = obj;
     addBlockVisTiles(obj);
 
-	if(obj->ID == Obj::TOWN)
-	{
-		towns.push_back(static_cast<CGTownInstance *>(obj));
-	}
-	if(obj->ID == Obj::HERO)
-	{
-		heroesOnMap.push_back(static_cast<CGHeroInstance*>(obj));
-	}
+    //todo: make this virtual method of CGObjectInstance
+    switch (obj->ID)
+    {
+    case Obj::TOWN:
+    	towns.push_back(static_cast<CGTownInstance *>(obj));
+    	break;
+    case Obj::HERO:
+    	heroesOnMap.push_back(static_cast<CGHeroInstance*>(obj));
+		break;
+	case Obj::SEER_HUT:
+	case Obj::QUEST_GUARD:
+	case Obj::BORDERGUARD:
+	case Obj::BORDER_GATE:
+		addQuest(obj);
+		break;
+    default:
+    	break;
+    }
 }
 
 void CMap::initTerrain()

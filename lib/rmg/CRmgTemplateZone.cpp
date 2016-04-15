@@ -2722,7 +2722,6 @@ void CRmgTemplateZone::addAllPossibleObjects(CMapGenerator* gen)
 				obj->quest->isCustomFirst = obj->quest->isCustomNext = obj->quest->isCustomComplete = false;
 
 				gen->banQuestArt(artid);
-				gen->map->addQuest(obj);
 
 				this->questArtZone->possibleObjects.push_back (generateArtInfo(artid));
 
@@ -2761,7 +2760,6 @@ void CRmgTemplateZone::addAllPossibleObjects(CMapGenerator* gen)
 				obj->quest->isCustomFirst = obj->quest->isCustomNext = obj->quest->isCustomComplete = false;
 
 				gen->banQuestArt(artid);
-				gen->map->addQuest(obj);
 
 				this->questArtZone->possibleObjects.push_back(generateArtInfo(artid));
 
@@ -2785,7 +2783,6 @@ void CRmgTemplateZone::addAllPossibleObjects(CMapGenerator* gen)
 				obj->quest->isCustomFirst = obj->quest->isCustomNext = obj->quest->isCustomComplete = false;
 
 				gen->banQuestArt(artid);
-				gen->map->addQuest(obj);
 
 				this->questArtZone->possibleObjects.push_back(generateArtInfo(artid));
 

@@ -45,6 +45,24 @@ static std::string & visitedTxt(const bool visited)
 	return VLC->generaltexth->allTexts[id];
 }
 
+
+void CQuest::addReplacements(MetaString &out, const std::string &base) const
+{
+	switch(missionType)
+	{
+	case MISSION_KILL_CREATURE:
+		out.addReplacement(stackToKill);
+		if (std::count(base.begin(), base.end(), '%') == 2) //say where is placed monster
+		{
+			out.addReplacement(VLC->generaltexth->arraytxt[147+stackDirection]);
+		}
+		break;
+	case MISSION_KILL_HERO:
+		out.addReplacement(heroName);
+		break;
+	}
+}
+
 bool CQuest::checkQuest(const CGHeroInstance * h) const
 {
 	switch (missionType)
@@ -388,6 +406,22 @@ void CQuest::getCompletionText(MetaString &iwText, std::vector<Component> &compo
 	}
 }
 
+void CQuest::serializeJson(JsonSerializeFormat & handler, const std::string & fieldName)
+{
+
+}
+
+
+bool IQuestObject::checkQuest(const CGHeroInstance* h) const
+{
+	return quest->checkQuest(h);
+}
+
+void IQuestObject::getVisitText (MetaString &text, std::vector<Component> &components, bool isCustom, bool FirstVisit, const CGHeroInstance * h) const
+{
+	quest->getVisitText (text,components, isCustom, FirstVisit, h);
+}
+
 CGSeerHut::CGSeerHut() : IQuestObject()
 {
 	quest->lastDay = -1;
@@ -463,33 +497,6 @@ std::string CGSeerHut::getHoverText(PlayerColor player) const
 		hoverName += ms.toString();
 	}
 	return hoverName;
-}
-
-void CQuest::addReplacements(MetaString &out, const std::string &base) const
-{
-	switch(missionType)
-	{
-	case MISSION_KILL_CREATURE:
-		out.addReplacement(stackToKill);
-		if (std::count(base.begin(), base.end(), '%') == 2) //say where is placed monster
-		{
-			out.addReplacement(VLC->generaltexth->arraytxt[147+stackDirection]);
-		}
-		break;
-	case MISSION_KILL_HERO:
-		out.addReplacement(heroName);
-		break;
-	}
-}
-
-bool IQuestObject::checkQuest(const CGHeroInstance* h) const
-{
-	return quest->checkQuest(h);
-}
-
-void IQuestObject::getVisitText (MetaString &text, std::vector<Component> &components, bool isCustom, bool FirstVisit, const CGHeroInstance * h) const
-{
-	quest->getVisitText (text,components, isCustom, FirstVisit, h);
 }
 
 void CGSeerHut::getCompletionText(MetaString &text, std::vector<Component> &components, bool isCustom, const CGHeroInstance * h) const
@@ -742,6 +749,11 @@ void CGSeerHut::blockingDialogAnswered(const CGHeroInstance *hero, ui32 answer) 
 	finishQuest(hero, answer);
 }
 
+void CGSeerHut::serializeJsonOptions(JsonSerializeFormat & handler)
+{
+	//quest and reward
+}
+
 void CGQuestGuard::init()
 {
 	blockVisit = true;
@@ -752,6 +764,11 @@ void CGQuestGuard::init()
 void CGQuestGuard::completeQuest(const CGHeroInstance *h) const
 {
 	cb->removeObject(this);
+}
+
+void CGQuestGuard::serializeJsonOptions(JsonSerializeFormat & handler)
+{
+	//quest only
 }
 
 void CGKeys::setPropertyDer (ui8 what, ui32 val) //101-108 - enable key for player 1-8
