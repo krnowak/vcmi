@@ -614,7 +614,11 @@ void CGCreature::serializeJsonOptions(JsonSerializeFormat & handler)
 		if(resources.nonZero())
 		{
 			for(size_t idx = 0; idx < (GameConstants::RESOURCE_QUANTITY - 1); idx++)
-				handler.getCurrent()["rewardResources"][GameConstants::RESOURCE_NAMES[idx]].Float() = resources[idx];
+			{
+				auto amount = resources[idx];
+				if(amount > 0)
+					handler.getCurrent()["rewardResources"][GameConstants::RESOURCE_NAMES[idx]].Float() = amount;
+			}
 		}
 
 		auto tmp = (gainedArtifact == ArtifactID(ArtifactID::NONE) ? "" : gainedArtifact.toArtifact()->identifier);

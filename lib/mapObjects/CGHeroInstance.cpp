@@ -1478,14 +1478,17 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 
 	if(handler.saving)
 	{
-		if(type)
+		if(ID == Obj::HERO || ID == Obj::PRISON)
 		{
-			handler.serializeString("type", type->identifier);
-		}
-		else
-		{
-			auto temp = VLC->heroh->heroes[subID]->identifier;
-			handler.serializeString("type", temp);
+			if(type)
+			{
+				handler.serializeString("type", type->identifier);
+			}
+			else
+			{
+				auto temp = VLC->heroh->heroes[subID]->identifier;
+				handler.serializeString("type", temp);
+			}
 		}
 	}
 	else
