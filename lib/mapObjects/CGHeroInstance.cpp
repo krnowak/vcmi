@@ -1510,7 +1510,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 
 	handler.serializeString("biography", biography);
 	//FIXME: JsonNode need int64 support
-	handler.serializeNumeric("experience", exp);
+	handler.serializeNumeric("experience", exp, 0);
 	handler.serializeString("name", name);
 	handler.serializeBool<ui8>("female", sex, 1, 0, 0xFF);
 
@@ -1535,19 +1535,35 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 	handler.serializeId<si32>("portrait", &VLC->heroh->decodeHero, &VLC->heroh->encodeHero, UNINITIALIZED_PORTRAIT, portrait);
 
 	{
-		auto primarySkills = handler.enterStruct("primarySkills");
-
 		if(handler.saving)
 		{
+			bool haveSkills = false;
+
 			for(int i = 0; i < GameConstants::PRIMARY_SKILLS; ++i)
 			{
-				int value = valOfBonuses(Selector::typeSubtype(Bonus::PRIMARY_SKILL, i).And(Selector::sourceType(Bonus::HERO_BASE_SKILL)));
+				if(valOfBonuses(Selector::typeSubtype(Bonus::PRIMARY_SKILL, i).And(Selector::sourceType(Bonus::HERO_BASE_SKILL))) != 0)
+				{
+					haveSkills = true;
+					break;
+				}
+			}
 
-				handler.serializeNumeric<int>(PrimarySkill::names[i], value, 0);
+			if(haveSkills)
+			{
+				auto primarySkills = handler.enterStruct("primarySkills");
+
+				for(int i = 0; i < GameConstants::PRIMARY_SKILLS; ++i)
+				{
+					int value = valOfBonuses(Selector::typeSubtype(Bonus::PRIMARY_SKILL, i).And(Selector::sourceType(Bonus::HERO_BASE_SKILL)));
+
+					handler.serializeNumeric<int>(PrimarySkill::names[i], value, 0);
+				}
 			}
 		}
 		else
 		{
+			auto primarySkills = handler.enterStruct("primarySkills");
+
 			for(int i = 0; i < GameConstants::PRIMARY_SKILLS; ++i)
 			{
 				int value = 0;

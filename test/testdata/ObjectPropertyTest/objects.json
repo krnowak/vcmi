@@ -1680,15 +1680,6 @@
 		"x" : 48,
 		"y" : 8,
 		"options" : {
-			"army" : [
-				{},
-				{},
-				{},
-				{},
-				{},
-				{},
-				{}
-			],
 			"owner" : "blue",
 			"removableUnits" : true
 		}
@@ -1735,15 +1726,6 @@
 		"x" : 53,
 		"y" : 8,
 		"options" : {
-			"army" : [
-				{},
-				{},
-				{},
-				{},
-				{},
-				{},
-				{}
-			],
 			"owner" : "blue",
 			"removableUnits" : false
 		}
@@ -3447,10 +3429,7 @@
 		},
 		"type" : "randomResource",
 		"x" : 4,
-		"y" : 32,
-		"options" : {
-			"amount" : 0
-		}
+		"y" : 32
 	},
 	"randomResource_122" : {
 		"l" : 0,
@@ -3469,10 +3448,7 @@
 		},
 		"type" : "randomResource",
 		"x" : 5,
-		"y" : 32,
-		"options" : {
-			"amount" : 0
-		}
+		"y" : 32
 	},
 	"randomResource_123" : {
 		"l" : 0,
@@ -3491,10 +3467,7 @@
 		},
 		"type" : "randomResource",
 		"x" : 6,
-		"y" : 32,
-		"options" : {
-			"amount" : 0
-		}
+		"y" : 32
 	},
 	"randomResource_124" : {
 		"l" : 0,
@@ -3513,10 +3486,7 @@
 		},
 		"type" : "randomResource",
 		"x" : 7,
-		"y" : 32,
-		"options" : {
-			"amount" : 0
-		}
+		"y" : 32
 	},
 	"randomResource_125" : {
 		"l" : 0,
@@ -3535,10 +3505,7 @@
 		},
 		"type" : "randomResource",
 		"x" : 8,
-		"y" : 32,
-		"options" : {
-			"amount" : 0
-		}
+		"y" : 32
 	},
 	"sign_126" : {
 		"l" : 0,
@@ -3931,10 +3898,7 @@
 		},
 		"type" : "resource",
 		"x" : 4,
-		"y" : 38,
-		"options" : {
-			"amount" : 0
-		}
+		"y" : 38
 	},
 	"sign_139" : {
 		"l" : 0,

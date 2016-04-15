@@ -48,9 +48,9 @@ void JsonSerializer::serializeFloat(const std::string & fieldName, double & valu
 	current->operator[](fieldName).Float() = value;
 }
 
-void JsonSerializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value)
+void JsonSerializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const boost::optional<si32> defaultValue, si32 & value)
 {
-	if(defaultValue != value)
+	if(defaultValue && defaultValue.get() != value)
 		current->operator[](fieldName).String() = enumMap.at(value);
 }
 
@@ -75,9 +75,7 @@ void JsonSerializer::serializeLIC(const std::string & fieldName, const TDecoder 
 void JsonSerializer::serializeLIC(const std::string & fieldName, LIC & value)
 {
 	if(value.any != value.standard)
-	{
 		writeLICPart(fieldName, "anyOf", value.encoder, value.any);
-	}
 
 	writeLICPart(fieldName, "allOf", value.encoder, value.all);
 	writeLICPart(fieldName, "noneOf", value.encoder, value.none);
@@ -86,14 +84,11 @@ void JsonSerializer::serializeLIC(const std::string & fieldName, LIC & value)
 void JsonSerializer::serializeLIC(const std::string & fieldName, LICSet & value)
 {
 	if(value.any != value.standard)
-	{
 		writeLICPart(fieldName, "anyOf", value.encoder, value.any);
-	}
 
 	writeLICPart(fieldName, "allOf", value.encoder, value.all);
 	writeLICPart(fieldName, "noneOf", value.encoder, value.none);
 }
-
 
 void JsonSerializer::serializeString(const std::string & fieldName, std::string & value)
 {
@@ -107,37 +102,37 @@ void JsonSerializer::writeLICPart(const std::string & fieldName, const std::stri
 	buf.reserve(data.size());
 
 	for(si32 idx = 0; idx < data.size(); idx++)
-	{
 		if(data[idx])
-		{
 			buf.push_back(encoder(idx));
-		}
-	}
 
-	std::sort(buf.begin(), buf.end());
-
-	if(!buf.empty())
-	{
-		auto & target = current->operator[](fieldName)[partName].Vector();
-
-		for(auto & s : buf)
-		{
-			JsonNode val(JsonNode::DATA_STRING);
-			val.String() = s;
-			target.push_back(std::move(val));
-		}
-	}
+	writeLICPartBuffer(fieldName, partName, buf);
 }
 
 void JsonSerializer::writeLICPart(const std::string & fieldName, const std::string & partName, const TEncoder & encoder, const std::set<si32> & data)
 {
-	auto & target = current->operator[](fieldName)[partName].Vector();
+	std::vector<std::string> buf;
+	buf.reserve(data.size());
 
 	for(const si32 item : data)
+		buf.push_back(encoder(item));
+
+	writeLICPartBuffer(fieldName, partName, buf);
+}
+
+void JsonSerializer::writeLICPartBuffer(const std::string & fieldName, const std::string & partName, std::vector<std::string> & buffer)
+{
+	if(!buffer.empty())
 	{
-		JsonNode val(JsonNode::DATA_STRING);
-		val.String() = encoder(item);
-		target.push_back(std::move(val));
+		std::sort(buffer.begin(), buffer.end());
+
+		auto & target = current->operator[](fieldName)[partName].Vector();
+
+		for(auto & s : buffer)
+		{
+			JsonNode val(JsonNode::DATA_STRING);
+			std::swap(val.String(), s);
+			target.push_back(std::move(val));
+		}
 	}
 }
 

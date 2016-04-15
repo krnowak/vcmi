@@ -608,12 +608,12 @@ void CGCreature::serializeJsonOptions(JsonSerializeFormat & handler)
 		if(hasStackAtSlot(SlotID(0)))
 		{
 			si32 amount = getStack(SlotID(0)).count;
-			handler.serializeNumeric("amount", amount);
+			handler.serializeNumeric("amount", amount, 0);
 		}
 
 		if(resources.nonZero())
 		{
-			for(size_t idx = 0; idx < resources.size(); idx++)
+			for(size_t idx = 0; idx < (GameConstants::RESOURCE_QUANTITY - 1); idx++)
 				handler.getCurrent()["rewardResources"][GameConstants::RESOURCE_NAMES[idx]].Float() = resources[idx];
 		}
 
@@ -935,8 +935,8 @@ void CGResource::blockingDialogAnswered(const CGHeroInstance *hero, ui32 answer)
 
 void CGResource::serializeJsonOptions(JsonSerializeFormat & handler)
 {
-	CCreatureSet::serializeJson(handler, "guards");
-	handler.serializeNumeric("amount", amount);
+	CCreatureSet::serializeJson(handler, "guards", 7);
+	handler.serializeNumeric("amount", amount, 0);
 	handler.serializeString("guardMessage", message);
 }
 
@@ -1429,7 +1429,7 @@ void CGArtifact::blockingDialogAnswered(const CGHeroInstance *hero, ui32 answer)
 void CGArtifact::serializeJsonOptions(JsonSerializeFormat& handler)
 {
 	handler.serializeString("guardMessage", message);
-	CCreatureSet::serializeJson(handler, "guards");
+	CCreatureSet::serializeJson(handler, "guards" ,7);
 
 	if(handler.saving && ID == Obj::SPELL_SCROLL)
 	{

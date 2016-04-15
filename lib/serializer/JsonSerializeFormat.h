@@ -180,6 +180,15 @@ public:
 	};
 
 	template <typename T>
+	void serializeNumericEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, T & value)
+	{
+		si32 temp = value;
+		serializeIntEnum(fieldName, enumMap, boost::none, temp);
+		if(!saving)
+			value = temp;
+	};
+
+	template <typename T>
 	void serializeNumeric(const std::string & fieldName, T & value)
 	{
 		double temp = value;
@@ -219,7 +228,7 @@ protected:
 	virtual void serializeFloat(const std::string & fieldName, double & value, const double & defaultValue) = 0;
 	virtual void serializeFloat(const std::string & fieldName, double & value) = 0;
 
-	virtual void serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value) = 0;
+	virtual void serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const boost::optional<si32> defaultValue, si32 & value) = 0;
 	virtual void serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value) = 0;
 private:
 	friend class JsonSerializeHelper;

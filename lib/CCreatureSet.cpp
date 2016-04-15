@@ -485,7 +485,7 @@ void CCreatureSet::armyChanged()
 
 void CCreatureSet::serializeJson(JsonSerializeFormat & handler, const std::string & fieldName, const boost::optional<int> fixedSize)
 {
-	if(handler.saving && stacks.empty() && !fixedSize)
+	if(handler.saving && stacks.empty())
 		return;
 
 	JsonNode & json = handler.getCurrent()[fieldName];
@@ -498,9 +498,7 @@ void CCreatureSet::serializeJson(JsonSerializeFormat & handler, const std::strin
 			vstd::amax(sz, p.first.getNum()+1);
 
 		if(fixedSize)
-		{
 			vstd::amax(sz, fixedSize.get());
-		}
 
 		json.Vector().resize(sz);
 

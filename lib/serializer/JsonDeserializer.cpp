@@ -61,13 +61,15 @@ void JsonDeserializer::serializeFloat(const std::string & fieldName, double & va
 		value = data.Float();
 }
 
-void JsonDeserializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const si32 defaultValue, si32 & value)
+void JsonDeserializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const boost::optional<si32> defaultValue, si32 & value)
 {
 	const std::string & valueName = current->operator[](fieldName).String();
 
+	const si32 actualOptinal = defaultValue ? defaultValue.get() : 0;
+
 	si32 rawValue = vstd::find_pos(enumMap, valueName);
 	if(rawValue < 0)
-		value = defaultValue;
+		value = actualOptinal;
 	else
 		value = rawValue;
 }

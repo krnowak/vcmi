@@ -199,7 +199,7 @@ void CMapFormatJson::serializeHeader(JsonSerializeFormat & handler)
 	handler.serializeNumeric("heroLevelLimit", mapHeader->levelLimit, 0);
 
 	//todo: support arbitrary percentage
-	handler.serializeNumericEnum("difficulty", HeaderDetail::difficultyMap, HeaderDetail::difficultyDefault, mapHeader->difficulty);
+	handler.serializeNumericEnum("difficulty", HeaderDetail::difficultyMap, mapHeader->difficulty);
 
 	serializePlayerInfo(handler);
 
@@ -242,9 +242,9 @@ void CMapFormatJson::serializePlayerInfo(JsonSerializeFormat & handler)
 		{
 			auto mainTown = handler.enterStruct("mainTown");
 			handler.serializeBool("generateHero", info.generateHeroAtMainTown);
-			handler.serializeNumeric("x", info.posOfMainTown.x);
-			handler.serializeNumeric("y", info.posOfMainTown.y);
-			handler.serializeNumeric("l", info.posOfMainTown.z);
+			handler.serializeNumeric("x", info.posOfMainTown.x, -1);
+			handler.serializeNumeric("y", info.posOfMainTown.y, -1);
+			handler.serializeNumeric("l", info.posOfMainTown.z, -1);
 		}
 		if(!handler.saving)
 		{
@@ -323,7 +323,6 @@ void CMapFormatJson::readTeams(JsonDeserializer & handler)
 	}
 }
 
-
 void CMapFormatJson::writeTeams(JsonSerializer & handler)
 {
 	auto teams = handler.enterStruct("teams");
@@ -371,7 +370,6 @@ void CMapFormatJson::serializeTriggeredEvents(JsonSerializeFormat & handler)
 	handler.serializeString("defeatString", mapHeader->defeatMessage);
 	handler.serializeNumeric("defeatIconIndex", mapHeader->defeatIconIndex);
 }
-
 
 void CMapFormatJson::readTriggeredEvents(JsonDeserializer & handler)
 {
