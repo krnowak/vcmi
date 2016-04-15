@@ -1726,8 +1726,7 @@
 		"x" : 53,
 		"y" : 8,
 		"options" : {
-			"owner" : "blue",
-			"removableUnits" : false
+			"owner" : "blue"
 		}
 	},
 	"sign_67" : {
@@ -1787,8 +1786,7 @@
 				{},
 				{}
 			],
-			"owner" : "red",
-			"removableUnits" : false
+			"owner" : "red"
 		}
 	},
 	"sign_69" : {
@@ -1862,8 +1860,7 @@
 					"amount" : 17,
 					"type" : "mage"
 				}
-			],
-			"removableUnits" : false
+			]
 		}
 	},
 	"sign_71" : {
@@ -2761,12 +2758,7 @@
 		"x" : 124,
 		"y" : 143,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"owner" : "tan",
-			"tightFormation" : false
+			"owner" : "tan"
 		}
 	},
 	"randomHero_104" : {
@@ -2789,12 +2781,7 @@
 		"x" : 119,
 		"y" : 143,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"owner" : "blue",
-			"tightFormation" : false
+			"owner" : "blue"
 		}
 	},
 	"randomHero_105" : {
@@ -2817,12 +2804,7 @@
 		"x" : 129,
 		"y" : 143,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"owner" : "green",
-			"tightFormation" : false
+			"owner" : "green"
 		}
 	},
 	"randomHero_106" : {
@@ -2845,12 +2827,7 @@
 		"x" : 134,
 		"y" : 143,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"owner" : "orange",
-			"tightFormation" : false
+			"owner" : "orange"
 		}
 	},
 	"randomHero_107" : {
@@ -2873,12 +2850,7 @@
 		"x" : 139,
 		"y" : 143,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"owner" : "purple",
-			"tightFormation" : false
+			"owner" : "purple"
 		}
 	},
 	"randomHero_108" : {
@@ -2901,12 +2873,7 @@
 		"x" : 144,
 		"y" : 143,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"owner" : "teal",
-			"tightFormation" : false
+			"owner" : "teal"
 		}
 	},
 	"randomHero_109" : {
@@ -2929,12 +2896,7 @@
 		"x" : 114,
 		"y" : 143,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"owner" : "pink",
-			"tightFormation" : false
+			"owner" : "pink"
 		}
 	},
 	"event_110" : {
@@ -5290,8 +5252,7 @@
 				]
 			},
 			"name" : "TownAsRed",
-			"spells" : {},
-			"tightFormation" : false
+			"spells" : {}
 		}
 	},
 	"sign_191" : {
@@ -5342,8 +5303,7 @@
 		"options" : {
 			"buildings" : {},
 			"hasFort" : false,
-			"spells" : {},
-			"tightFormation" : false
+			"spells" : {}
 		}
 	},
 	"sign_193" : {
@@ -5413,8 +5373,7 @@
 					"townHall"
 				]
 			},
-			"spells" : {},
-			"tightFormation" : false
+			"spells" : {}
 		}
 	},
 	"sign_195" : {
@@ -7211,11 +7170,6 @@
 		"x" : 33,
 		"y" : 13,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
-			"tightFormation" : false,
 			"type" : "valeska"
 		}
 	},
@@ -7262,15 +7216,10 @@
 		"x" : 33,
 		"y" : 16,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
 			"experience" : 99999999,
 			"name" : "Anul",
 			"patrolRadius" : 9,
 			"portrait" : "orrin",
-			"tightFormation" : false,
 			"type" : "luna",
 			"female" : false
 		}
@@ -7296,10 +7245,6 @@
 		"x" : 33,
 		"y" : 19,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
 			"secondarySkills" : {
 				"artillery" : "advanced",
 				"learning" : "expert",
@@ -7310,7 +7255,6 @@
 				"resistance" : "advanced",
 				"firstAid" : "expert"
 			},
-			"tightFormation" : false,
 			"type" : "orrin"
 		}
 	},
@@ -7345,7 +7289,6 @@
 				"spellbook" : "spellBook",
 				"torso" : "armorOfWonder"
 			},
-			"tightFormation" : false,
 			"type" : "edric"
 		}
 	},
@@ -7370,10 +7313,6 @@
 		"x" : 33,
 		"y" : 25,
 		"options" : {
-			"artifacts" : {
-				"backpack" : [
-				]
-			},
 			"spellBook" : [
 				"summonBoat",
 				"scuttleBoat",
@@ -7445,7 +7384,6 @@
 				"waterElemental",
 				"airElemental"
 			],
-			"tightFormation" : false,
 			"type" : "sorsha"
 		}
 	},

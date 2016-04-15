@@ -284,42 +284,36 @@
 	"name" : "ObjectPropertyTest v1",
 	"players" : {
 		"blue" : {
-			"allowedFactions" : {},
 			"canPlay" : "AIOnly",
 			"heroes" : {
 				"randomHero_104" : {}
 			}
 		},
 		"green" : {
-			"allowedFactions" : {},
 			"canPlay" : "AIOnly",
 			"heroes" : {
 				"randomHero_105" : {}
 			}
 		},
 		"orange" : {
-			"allowedFactions" : {},
 			"canPlay" : "AIOnly",
 			"heroes" : {
 				"randomHero_106" : {}
 			}
 		},
 		"pink" : {
-			"allowedFactions" : {},
 			"canPlay" : "AIOnly",
 			"heroes" : {
 				"randomHero_109" : {}
 			}
 		},
 		"purple" : {
-			"allowedFactions" : {},
 			"canPlay" : "AIOnly",
 			"heroes" : {
 				"randomHero_107" : {}
 			}
 		},
 		"red" : {
-			"allowedFactions" : {},
 			"canPlay" : "PlayerOrAI",
 			"mainHero" : "ingham",
 			"heroes" : {
@@ -329,14 +323,12 @@
 			}
 		},
 		"tan" : {
-			"allowedFactions" : {},
 			"canPlay" : "AIOnly",
 			"heroes" : {
 				"randomHero_103" : {}
 			}
 		},
 		"teal" : {
-			"allowedFactions" : {},
 			"canPlay" : "AIOnly",
 			"heroes" : {
 				"randomHero_108" : {}
@@ -344,8 +336,6 @@
 		}
 	},
 	"predefinedHeroes" : {},
-	"rumors" : [
-	],
 	"teams" : [
 	],
 	"triggeredEvents" : {
