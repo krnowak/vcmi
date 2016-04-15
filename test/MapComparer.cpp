@@ -13,6 +13,9 @@
 
 #include "MapComparer.h"
 
+#include "../lib/ScopeGuard.h"
+#include "../lib/mapping/CMap.h"
+
 #define VCMI_CHECK_FIELD_EQUAL_P(field) BOOST_CHECK_EQUAL(actual->field, expected->field)
 
 #define VCMI_CHECK_FIELD_EQUAL(field) BOOST_CHECK_EQUAL(actual.field, expected.field)
@@ -147,6 +150,7 @@ void checkEqual(const TerrainTile & actual, const TerrainTile & expected)
 
 }
 
+//MapComparer
 void MapComparer::compareHeader()
 {
 	//map size parameters are vital for further checks
@@ -271,4 +275,147 @@ void MapComparer::operator() (const std::unique_ptr<CMap>& actual, const std::un
 	this->actual = actual.get();
 	this->expected = expected.get();
 	compare();
+}
+
+//JsonMapComparer
+JsonMapComparer::JsonMapComparer():
+	strict(false)
+{
+
+}
+
+
+vstd::ScopeGuard<JsonMapComparer::TScopeGuard> JsonMapComparer::pushName(const std::string & name)
+{
+	namePath.push_back(name);
+	return vstd::makeScopeGuard<TScopeGuard>([this](){namePath.pop_back();});
+}
+
+std::string JsonMapComparer::buildMessage(const std::string & message)
+{
+	std::stringstream buf;
+
+	for(auto & s : namePath)
+		buf << s << "|";
+	buf << " " << message;
+	return buf.str();
+}
+
+void JsonMapComparer::addError(const std::string & message)
+{
+	BOOST_ERROR(buildMessage(message));
+}
+
+void JsonMapComparer::addWarning(const std::string & message)
+{
+	BOOST_WARN_MESSAGE(false, buildMessage(message));
+}
+
+void JsonMapComparer::check(const bool condition, const std::string & message)
+{
+	if(strict)
+		BOOST_REQUIRE_MESSAGE(condition, buildMessage(message));
+	else
+		BOOST_CHECK_MESSAGE(condition, buildMessage(message));
+}
+
+void JsonMapComparer::checkEqualJson(const JsonMap & actual, const JsonMap & expected)
+{
+    for(const auto & p : expected)
+		checkStructField(actual, p.first, p.second);
+	for(const auto & p : actual)
+		checkExcessStructField(p.second, p.first, expected);
+}
+
+void JsonMapComparer::checkEqualJson(const JsonVector & actual, const JsonVector & expected)
+{
+	check(actual.size() == expected.size(), "size mismatch");
+
+	size_t sz = std::min(actual.size(), expected.size());
+
+	for(size_t idx = 0; idx < sz; idx ++)
+	{
+		auto guard = pushName(boost::to_string(idx));
+
+		checkEqualJson(actual.at(idx), expected.at(idx));
+	}
+}
+
+void JsonMapComparer::checkEqualJson(const JsonNode & actual, const JsonNode & expected)
+{
+	//name already pushed here
+	if(actual.getType() != expected.getType())
+	{
+		addError("type mismatch");
+	}
+	else
+	{
+		switch (actual.getType())
+		{
+		case JsonNode::DATA_NULL:
+			break; //do nothing
+		case JsonNode::DATA_BOOL:
+			check(actual.Bool() == expected.Bool(), "mismatch");
+			break;
+		case JsonNode::DATA_FLOAT:
+			check(actual.Float() == expected.Float(), "mismatch");
+			break;
+		case JsonNode::DATA_STRING:
+			check(actual.String() == expected.String(), "mismatch");
+			break;
+		case JsonNode::DATA_VECTOR:
+			checkEqualJson(actual.Vector(), expected.Vector());
+			break;
+		case JsonNode::DATA_STRUCT:
+			checkEqualJson(actual.Struct(), expected.Struct());
+			break;
+		default:
+			BOOST_FAIL("Unknown Json type");
+			break;
+		}
+	}
+}
+
+void JsonMapComparer::checkExcessStructField(const JsonNode & actualValue, const std::string & name, const JsonMap & expected)
+{
+	auto guard = pushName(name);
+
+	if(!vstd::contains(expected, name))
+	{
+		if(actualValue.getType() == JsonNode::DATA_NULL)
+			addWarning("excess");
+		else
+			addError("excess");
+	}
+}
+
+void JsonMapComparer::checkStructField(const JsonMap & actual, const std::string & name, const JsonNode & expectedValue)
+{
+	auto guard = pushName(name);
+
+	if(!vstd::contains(actual, name))
+        addError("missing");
+	else
+		checkEqualJson(actual.at(name), expectedValue);
+}
+
+void JsonMapComparer::compareHeader(const JsonNode & actual, const JsonNode & expected)
+{
+	strict = false;
+	auto guard = pushName("hdr");
+	checkEqualJson(actual, expected);
+}
+
+void JsonMapComparer::compareObjects(const JsonNode & actual, const JsonNode & expected)
+{
+	strict = false;
+	auto guard = pushName("obj");
+	checkEqualJson(actual, expected);
+}
+
+void JsonMapComparer::compareTerrain(const std::string & levelName, const JsonNode & actual, const JsonNode & expected)
+{
+	strict = true;
+	auto guard = pushName("levelName");
+	checkEqualJson(actual, expected);
 }

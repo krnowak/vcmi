@@ -161,6 +161,7 @@ BOOST_AUTO_TEST_CASE(CMapFormatVCMI_ObjectPropertyTestMap)
 	const JsonNode actualHeader = getFromArchive(actualDataLoader, "header.json");
 	const JsonNode actualObjects = getFromArchive(actualDataLoader, "objects.json");
 	const JsonNode actualSurface = getFromArchive(actualDataLoader, "surface_terrain.json");
+	const JsonNode actualUnderground = getFromArchive(actualDataLoader, "underground_terrain.json");
 
 	{
 		auto path = VCMIDirs::get().userDataPath()/"test_object_property.vmap";
@@ -174,21 +175,24 @@ BOOST_AUTO_TEST_CASE(CMapFormatVCMI_ObjectPropertyTestMap)
 		logGlobal->infoStream() << "Test map has been saved to " << path;
 	}
 
-    for(const auto & p : expectedHeader.Struct())
 	{
-		if(!vstd::contains(actualHeader.Struct(), p.first))
-			BOOST_ERROR("Header field missing "+p.first);
-		else if(p.second != actualHeader[p.first])
-			BOOST_ERROR("Header field differ "+p.first);
+		JsonMapComparer c;
+		c.compareHeader(actualHeader, expectedHeader);
 	}
 
-    for(const auto & p : expectedObjects.Struct())
 	{
-		if(!vstd::contains(actualObjects.Struct(), p.first))
-			BOOST_ERROR("Map object missing "+p.first);
+		JsonMapComparer c;
+		c.compareObjects(actualObjects, expectedObjects);
+	}
 
-		else if(p.second != actualObjects[p.first])
-			BOOST_ERROR("Map object differ "+p.first);
+	{
+		JsonMapComparer c;
+		c.compareTerrain("surface", actualSurface, expectedSurface);
+	}
+
+	{
+		JsonMapComparer c;
+		c.compareTerrain("underground", actualUnderground, expectedUnderground);
 	}
 
 	logGlobal->info("CMapFormatVCMI_ObjectPropertyTestMap finish");
