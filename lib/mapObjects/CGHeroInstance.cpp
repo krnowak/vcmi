@@ -1607,7 +1607,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 				if(rawId < 0 || rawId >= GameConstants::SKILL_QUANTITY)
 					logGlobal->errorStream() << "Invalid secondary skill " << rawId;
 
-				handler.serializeNumericEnum<ui8>(NSecondarySkill::names[rawId], NSecondarySkill::levels, 0, p.second);
+				handler.serializeNumericEnum<ui8>(NSecondarySkill::names[rawId], p.second, 0, NSecondarySkill::levels);
 			}
 		}
 	}

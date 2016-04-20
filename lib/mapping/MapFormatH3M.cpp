@@ -1832,9 +1832,9 @@ void CMapLoaderH3M::readQuest(IQuestObject * guard)
 
 	switch(guard->quest->missionType)
 	{
-	case 0:
+	case CQuest::MISSION_NONE:
 		return;
-	case 2:
+	case CQuest::MISSION_PRIMARY_STAT:
 		{
 			guard->quest->m2stats.resize(4);
 			for(int x = 0; x < 4; ++x)
@@ -1843,14 +1843,14 @@ void CMapLoaderH3M::readQuest(IQuestObject * guard)
 			}
 		}
 		break;
-	case 1:
-	case 3:
-	case 4:
+	case CQuest::MISSION_LEVEL:
+	case CQuest::MISSION_KILL_HERO:
+	case CQuest::MISSION_KILL_CREATURE:
 		{
 			guard->quest->m13489val = reader.readUInt32();
 			break;
 		}
-	case 5:
+	case CQuest::MISSION_ART:
 		{
 			int artNumber = reader.readUInt8();
 			for(int yy = 0; yy < artNumber; ++yy)
@@ -1861,7 +1861,7 @@ void CMapLoaderH3M::readQuest(IQuestObject * guard)
 			}
 			break;
 		}
-	case 6:
+	case CQuest::MISSION_ARMY:
 		{
 			int typeNumber = reader.readUInt8();
 			guard->quest->m6creatures.resize(typeNumber);
@@ -1872,7 +1872,7 @@ void CMapLoaderH3M::readQuest(IQuestObject * guard)
 			}
 			break;
 		}
-	case 7:
+	case CQuest::MISSION_RESOURCES:
 		{
 			guard->quest->m7resources.resize(7);
 			for(int x = 0; x < 7; ++x)
@@ -1881,8 +1881,8 @@ void CMapLoaderH3M::readQuest(IQuestObject * guard)
 			}
 			break;
 		}
-	case 8:
-	case 9:
+	case CQuest::MISSION_HERO:
+	case CQuest::MISSION_PLAYER:
 		{
 			guard->quest->m13489val = reader.readUInt8();
 			break;

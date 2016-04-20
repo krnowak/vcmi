@@ -37,30 +37,25 @@ void JsonSerializer::serializeEnum(const std::string & fieldName, const std::str
 	current->operator[](fieldName).String() = value ? trueValue : falseValue;
 }
 
-void JsonSerializer::serializeFloat(const std::string & fieldName, double & value, const double & defaultValue)
+void JsonSerializer::serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const TDecoder & decoder, const TEncoder & encoder)
 {
-	if(defaultValue != value)
-		current->operator[](fieldName).Float() = value;
-}
-
-void JsonSerializer::serializeFloat(const std::string & fieldName, double & value)
-{
-	current->operator[](fieldName).Float() = value;
-}
-
-void JsonSerializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const boost::optional<si32> defaultValue, si32 & value)
-{
-	if(defaultValue && defaultValue.get() != value)
-		current->operator[](fieldName).String() = enumMap.at(value);
-}
-
-void JsonSerializer::serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value)
-{
-	if(defaultValue != value)
+	if(!defaultValue || defaultValue.get() != value)
 	{
 		std::string identifier = encoder(value);
 		serializeString(fieldName, identifier);
 	}
+}
+
+void JsonSerializer::serializeInternal(const std::string & fieldName, double & value, const boost::optional<double> & defaultValue)
+{
+	if(!defaultValue || defaultValue.get() != value)
+		current->operator[](fieldName).Float() = value;
+}
+
+void JsonSerializer::serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const std::vector<std::string> & enumMap)
+{
+	if(!defaultValue || defaultValue.get() != value)
+		current->operator[](fieldName).String() = enumMap.at(value);
 }
 
 void JsonSerializer::serializeLIC(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const std::vector<bool> & standard, std::vector<bool> & value)

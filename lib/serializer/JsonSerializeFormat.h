@@ -149,6 +149,7 @@ public:
 
 	virtual void serializeBool(const std::string & fieldName, boost::logic::tribool & value) = 0;
 
+	///bool <-> Json string enum
 	virtual void serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value) = 0;
 
 	/** @brief Restrictive ("anyOf") simple serialization of Logical identifier condition, simple deserialization (allOf=anyOf)
@@ -170,53 +171,37 @@ public:
 	 */
 	virtual void serializeLIC(const std::string & fieldName, LICSet & value) = 0;
 
+	///String <-> Json string
+	virtual void serializeString(const std::string & fieldName, std::string & value) = 0;
+
 	template <typename T>
-	void serializeNumericEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const T defaultValue, T & value)
+	void serializeNumericEnum(const std::string & fieldName, T & value, const std::vector<std::string> & enumMap)
 	{
-		si32 temp = value;
-		serializeIntEnum(fieldName, enumMap, defaultValue, temp);
-		if(!saving)
-			value = temp;
+		doSerializeInternal<T, T, si32>(fieldName, value, boost::none, enumMap);
 	};
 
 	template <typename T>
-	void serializeNumericEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, T & value)
+	void serializeNumericEnum(const std::string & fieldName, T & value, const T defaultValue, const std::vector<std::string> & enumMap)
 	{
-		si32 temp = value;
-		serializeIntEnum(fieldName, enumMap, boost::none, temp);
-		if(!saving)
-			value = temp;
+		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, enumMap);
 	};
 
 	template <typename T>
 	void serializeNumeric(const std::string & fieldName, T & value)
 	{
-		double temp = value;
-		serializeFloat(fieldName, temp);
-		if(!saving)
-			value = temp;
+		doSerializeInternal<T, T, double>(fieldName, value, boost::none);
 	};
 
 	template <typename T, typename U>
 	void serializeNumeric(const std::string & fieldName, T & value, const U & defaultValue)
 	{
-		double tempDefault = defaultValue;
-		double temp = value;
-		serializeFloat(fieldName, temp, tempDefault);
-		if(!saving)
-			value = temp;
+		doSerializeInternal<T, U, double>(fieldName, value, defaultValue);
 	};
-
-	virtual void serializeString(const std::string & fieldName, std::string & value) = 0;
 
 	template <typename T>
 	void serializeId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const T & defaultValue, T & value)
 	{
-		const si32 tempDefault = si32(defaultValue);
-		si32 tempValue = si32(value);
-		serializeIntId(fieldName, decoder, encoder, tempDefault, tempValue);
-		if(!saving)
-			value = T(tempValue);
+		doSerializeInternal<T,T,si32>(fieldName, value, defaultValue, decoder, encoder);
 	}
 
 protected:
@@ -225,12 +210,28 @@ protected:
 
 	JsonSerializeFormat(JsonNode & root_, const bool saving_);
 
-	virtual void serializeFloat(const std::string & fieldName, double & value, const double & defaultValue) = 0;
-	virtual void serializeFloat(const std::string & fieldName, double & value) = 0;
+	///Numeric Id <-> String Id
+	virtual void serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const TDecoder & decoder, const TEncoder & encoder) = 0;
 
-	virtual void serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const boost::optional<si32> defaultValue, si32 & value) = 0;
-	virtual void serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value) = 0;
+	///Numeric <-> Json double
+	virtual void serializeInternal(const std::string & fieldName, double & value, const boost::optional<double> & defaultValue) = 0;
+
+	///Enum/Numeric <-> Json string enum
+	virtual void serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const std::vector<std::string> & enumMap) = 0;
+
 private:
+    template <typename VType, typename DVType, typename IType, typename... Args>
+    void doSerializeInternal(const std::string & fieldName, VType & value, const boost::optional<DVType> & defaultValue, Args ... args)
+    {
+		const boost::optional<IType> tempDefault = defaultValue ? boost::optional<IType>(static_cast<IType>(defaultValue.get())) : boost::none;
+		IType temp = static_cast<IType>(value);
+
+		serializeInternal(fieldName, temp, tempDefault, args...);
+
+		if(!saving)
+			value = static_cast<VType>(temp);
+    }
+
 	friend class JsonSerializeHelper;
 	friend class JsonStructSerializer;
 	friend class JsonArraySerializer;

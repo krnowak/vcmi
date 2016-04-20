@@ -41,55 +41,42 @@ void JsonDeserializer::serializeEnum(const std::string & fieldName, const std::s
 	value = tmp.String() == trueValue;
 }
 
-void JsonDeserializer::serializeFloat(const std::string & fieldName, double & value, const double & defaultValue)
-{
-	const JsonNode & data = current->operator[](fieldName);
-
-	if(data.getType() != JsonNode::DATA_FLOAT)
-		value = defaultValue;
-	else
-		value = data.Float();
-}
-
-void JsonDeserializer::serializeFloat(const std::string & fieldName, double & value)
-{
-	const JsonNode & data = current->operator[](fieldName);
-
-	if(data.getType() != JsonNode::DATA_FLOAT)
-		value = 0;//todo: report error
-	else
-		value = data.Float();
-}
-
-void JsonDeserializer::serializeIntEnum(const std::string & fieldName, const std::vector<std::string> & enumMap, const boost::optional<si32> defaultValue, si32 & value)
-{
-	const std::string & valueName = current->operator[](fieldName).String();
-
-	const si32 actualOptinal = defaultValue ? defaultValue.get() : 0;
-
-	si32 rawValue = vstd::find_pos(enumMap, valueName);
-	if(rawValue < 0)
-		value = actualOptinal;
-	else
-		value = rawValue;
-}
-
-void JsonDeserializer::serializeIntId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const si32 defaultValue, si32 & value)
+void JsonDeserializer::serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const TDecoder & decoder, const TEncoder & encoder)
 {
 	std::string identifier;
 	serializeString(fieldName, identifier);
 
-	if(identifier == "")
-	{
-		value = defaultValue;
-		return;
-	}
+	value = defaultValue ? defaultValue.get() : 0;
 
-	si32 rawId = decoder(identifier);
-	if(rawId >= 0)
-		value = rawId;
+	if(identifier != "")
+	{
+		si32 rawId = decoder(identifier);
+		if(rawId >= 0)
+			value = rawId;
+	}
+}
+
+void JsonDeserializer::serializeInternal(const std::string & fieldName, double & value, const boost::optional<double> & defaultValue)
+{
+	const JsonNode & data = current->operator[](fieldName);
+
+	if(data.getType() != JsonNode::DATA_FLOAT)
+		value = defaultValue ? defaultValue.get() : 0;//todo: report error on not null?
 	else
-		value = defaultValue;
+		value = data.Float();
+}
+
+void JsonDeserializer::serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const std::vector<std::string> & enumMap)
+{
+	const std::string & valueName = current->operator[](fieldName).String();
+
+	const si32 actualOptional = defaultValue ? defaultValue.get() : 0;
+
+	si32 rawValue = vstd::find_pos(enumMap, valueName);
+	if(rawValue < 0)
+		value = actualOptional;
+	else
+		value = rawValue;
 }
 
 void JsonDeserializer::serializeLIC(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const std::vector<bool> & standard, std::vector<bool> & value)

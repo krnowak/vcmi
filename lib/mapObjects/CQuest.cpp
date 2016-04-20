@@ -20,6 +20,8 @@
 #include "MiscObjects.h"
 #include "../IGameCallback.h"
 #include "../CGameState.h"
+#include "../StringConstants.h"
+#include "../serializer/JsonSerializeFormat.h"
 
 std::map <PlayerColor, std::set <ui8> > CGKeys::playerKeyMap;
 
@@ -408,9 +410,67 @@ void CQuest::getCompletionText(MetaString &iwText, std::vector<Component> &compo
 
 void CQuest::serializeJson(JsonSerializeFormat & handler, const std::string & fieldName)
 {
+	auto q = handler.enterStruct(fieldName);
+
+	if(handler.saving)
+		handler.getCurrent().setType(JsonNode::DATA_STRUCT);
+
+	handler.serializeString("firstVisitText", firstVisitText);
+	handler.serializeString("nextVisitText", nextVisitText);
+	handler.serializeString("completedText", completedText);
+
+	if(!handler.saving)
+	{
+		isCustomFirst = firstVisitText.size() > 0;
+		isCustomNext = nextVisitText.size() > 0;
+		isCustomComplete = completedText.size() > 0;
+	}
+
+	static const std::vector<std::string> MISSION_TYPE_JSON =
+	{
+		"None", "Level", "PrimaryStat", "KillHero", "KillCreature", "Artifact", "Army", "Resources", "Hero", "Player"
+	};
+
+	handler.serializeNumericEnum("missionType", missionType, Emission::MISSION_NONE, MISSION_TYPE_JSON);
+	handler.serializeNumeric<si32>("timeLimit", lastDay, -1);
+
+	switch (missionType)
+	{
+	case MISSION_NONE :
+		break;
+	case MISSION_LEVEL:
+		handler.serializeNumeric("heroLevel", m13489val, -1);
+		break;
+	case MISSION_PRIMARY_STAT:
+		{
+			auto primarySkills = handler.enterStruct("primarySkills");
+			if(!handler.saving)
+				m2stats.resize(GameConstants::PRIMARY_SKILLS);
+
+			for(int i = 0; i < GameConstants::PRIMARY_SKILLS; ++i)
+				handler.serializeNumeric<ui32>(PrimarySkill::names[i], m2stats[i], 0);
+		}
+		break;
+	case MISSION_KILL_HERO:
+		break;
+	case MISSION_KILL_CREATURE:
+		break;
+	case MISSION_ART:
+		break;
+	case MISSION_ARMY:
+		break;
+	case MISSION_RESOURCES:
+		break;
+	case MISSION_HERO:
+		break;
+	case MISSION_PLAYER:
+		break;
+
+	default:
+		break;
+	}
 
 }
-
 
 bool IQuestObject::checkQuest(const CGHeroInstance* h) const
 {
@@ -752,6 +812,7 @@ void CGSeerHut::blockingDialogAnswered(const CGHeroInstance *hero, ui32 answer) 
 void CGSeerHut::serializeJsonOptions(JsonSerializeFormat & handler)
 {
 	//quest and reward
+	quest->serializeJson(handler, "quest");
 }
 
 void CGQuestGuard::init()
@@ -768,7 +829,8 @@ void CGQuestGuard::completeQuest(const CGHeroInstance *h) const
 
 void CGQuestGuard::serializeJsonOptions(JsonSerializeFormat & handler)
 {
-	//quest only
+	//quest only, do not call base class
+	quest->serializeJson(handler, "quest");
 }
 
 void CGKeys::setPropertyDer (ui8 what, ui32 val) //101-108 - enable key for player 1-8
