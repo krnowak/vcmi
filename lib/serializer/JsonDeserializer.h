@@ -19,8 +19,6 @@ class JsonDeserializer: public JsonSerializeFormat
 public:
 	JsonDeserializer(JsonNode & root_);
 
-	void serializeBool(const std::string & fieldName, bool & value) override;
-	void serializeBool(const std::string & fieldName, boost::logic::tribool & value) override;
 	void serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value) override;
 	void serializeLIC(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const std::vector<bool> & standard, std::vector<bool> & value) override;
 	void serializeLIC(const std::string & fieldName, LIC & value) override;
@@ -28,6 +26,7 @@ public:
 	void serializeString(const std::string & fieldName, std::string & value) override;
 
 protected:
+	void serializeInternal(const std::string & fieldName, boost::logic::tribool & value) override;
 	void serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const TDecoder & decoder, const TEncoder & encoder)	override;
 	void serializeInternal(const std::string & fieldName, double & value, const boost::optional<double> & defaultValue) override;
 	void serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const std::vector<std::string> & enumMap) override;

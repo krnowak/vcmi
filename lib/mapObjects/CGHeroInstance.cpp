@@ -1507,7 +1507,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 		}
 	}
 	CCreatureSet::serializeJson(handler, "army");
-	handler.serializeBool<ui8>("tightFormation", formation, 1, 0);
+	handler.serializeBool<ui8>("tightFormation", formation, 1, 0, 0);
 
 	CArtifactSet::serializeJson(handler, "artifacts");//todo:CArtifactSet::serializeJson
 

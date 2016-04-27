@@ -20,21 +20,15 @@ JsonSerializer::JsonSerializer(JsonNode & root_):
 
 }
 
-void JsonSerializer::serializeBool(const std::string & fieldName, bool & value)
-{
-	if(value)
-		current->operator[](fieldName).Bool() = true;
-}
-
-void JsonSerializer::serializeBool(const std::string & fieldName, boost::logic::tribool & value)
-{
-	if(!boost::logic::indeterminate(value))
-		current->operator[](fieldName).Bool() = value;
-}
-
 void JsonSerializer::serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value)
 {
 	current->operator[](fieldName).String() = value ? trueValue : falseValue;
+}
+
+void JsonSerializer::serializeInternal(const std::string & fieldName, boost::logic::tribool & value)
+{
+	if(!boost::logic::indeterminate(value))
+		current->operator[](fieldName).Bool() = value;
 }
 
 void JsonSerializer::serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const TDecoder & decoder, const TEncoder & encoder)

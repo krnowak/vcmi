@@ -20,25 +20,20 @@ JsonDeserializer::JsonDeserializer(JsonNode & root_):
 
 }
 
-void JsonDeserializer::serializeBool(const std::string & fieldName, bool & value)
+void JsonDeserializer::serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value)
 {
-	value = current->operator[](fieldName).Bool();
+	const JsonNode & tmp = current->operator[](fieldName);
+
+	value = tmp.String() == trueValue;
 }
 
-void JsonDeserializer::serializeBool(const std::string & fieldName, boost::logic::tribool & value)
+void JsonDeserializer::serializeInternal(const std::string & fieldName, boost::logic::tribool & value)
 {
 	const JsonNode & data = current->operator[](fieldName);
 	if(data.getType() != JsonNode::DATA_BOOL)
 		value = boost::logic::indeterminate;
 	else
 		value = data.Bool();
-}
-
-void JsonDeserializer::serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value)
-{
-	const JsonNode & tmp = current->operator[](fieldName);
-
-	value = tmp.String() == trueValue;
 }
 
 void JsonDeserializer::serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const TDecoder & decoder, const TEncoder & encoder)

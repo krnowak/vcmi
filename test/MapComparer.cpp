@@ -343,12 +343,16 @@ void JsonMapComparer::checkEqualJson(const JsonVector & actual, const JsonVector
 
 void JsonMapComparer::checkEqualJson(const JsonNode & actual, const JsonNode & expected)
 {
-	//name already pushed here
-	if(actual.getType() != expected.getType())
-	{
+	//name has been pushed before
+
+	const bool validType = actual.getType() == expected.getType();
+	const bool actualNull = actual.getType() == JsonNode::DATA_NULL;
+
+	if(!validType)
 		addError("type mismatch");
-	}
-	else
+
+	//do detail checks avoiding assertions in JsonNode
+	if(validType || actualNull)
 	{
 		switch (actual.getType())
 		{
@@ -394,7 +398,10 @@ void JsonMapComparer::checkStructField(const JsonMap & actual, const std::string
 	auto guard = pushName(name);
 
 	if(!vstd::contains(actual, name))
-        addError("missing");
+	{
+		addError("missing");
+		checkEqualJson(JsonNode(), expectedValue);
+	}
 	else
 		checkEqualJson(actual.at(name), expectedValue);
 }

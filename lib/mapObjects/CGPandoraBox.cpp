@@ -17,6 +17,7 @@
 #include "../spells/CSpellHandler.h"
 #include "../StartInfo.h"
 #include "../IGameCallback.h"
+#include "../serializer/JsonSerializeFormat.h"
 
 ///helpers
 static void showInfoDialog(const PlayerColor playerID, const ui32 txtID, const ui16 soundID)
@@ -336,6 +337,11 @@ void CGPandoraBox::afterSuccessfulVisit() const
 	cb->removeAfterVisit(this);
 }
 
+void CGPandoraBox::serializeJsonOptions(JsonSerializeFormat & handler)
+{
+
+}
+
 void CGEvent::onHeroVisit( const CGHeroInstance * h ) const
 {
 	if(!(availableFor & (1 << h->tempOwner.getNum())))
@@ -376,4 +382,14 @@ void CGEvent::afterSuccessfulVisit() const
 	}
 	else if(hasGuardians)
 		hasGuardians = false;
+}
+
+void CGEvent::serializeJsonOptions(JsonSerializeFormat & handler)
+{
+	CGPandoraBox::serializeJsonOptions(handler);
+
+    handler.serializeBool<bool>("aIActivable", computerActivate, true, false, false);
+    handler.serializeBool<bool>("humanActivable", humanActivate, true, false, true);
+
+
 }

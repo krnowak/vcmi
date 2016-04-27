@@ -138,8 +138,13 @@ JsonStructSerializer JsonSerializeFormat::enterStruct(const std::string & fieldN
 	return JsonStructSerializer (*this, fieldName);
 }
 
-JsonArraySerializer JsonSerializeFormat::enterArray(const std::string& fieldName)
+JsonArraySerializer JsonSerializeFormat::enterArray(const std::string & fieldName)
 {
 	return JsonArraySerializer(*this, fieldName);
+}
+
+void JsonSerializeFormat::serializeBool(const std::string & fieldName, bool & value)
+{
+	serializeBool<bool>(fieldName, value, true, false, false);
 }
 

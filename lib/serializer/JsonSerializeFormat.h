@@ -116,26 +116,20 @@ public:
 	JsonStructSerializer enterStruct(const std::string & fieldName);
 	JsonArraySerializer enterArray(const std::string & fieldName);
 
-	template <typename T>
-	void serializeBool(const std::string & fieldName, T & value, const T trueValue, const T falseValue)
-	{
-		bool temp = (value == trueValue);
-		serializeBool(fieldName, temp);
-		if(!saving)
-			value = temp ? trueValue : falseValue;
-	}
-
+	///Anything comparable <-> Json bool
 	template <typename T>
 	void serializeBool(const std::string & fieldName, T & value, const T trueValue, const T falseValue, const T defaultValue)
 	{
 		boost::logic::tribool temp(boost::logic::indeterminate);
 
-		if(value == trueValue)
+		if(value == defaultValue)
+			;//leave as indeterminate
+		else if(value == trueValue)
 			temp = true;
 		else if(value == falseValue)
 			temp = false;
 
-		serializeBool(fieldName, temp);
+		serializeInternal(fieldName, temp);
 		if(!saving)
 		{
 			if(boost::logic::indeterminate(temp))
@@ -145,9 +139,14 @@ public:
 		}
 	}
 
-	virtual void serializeBool(const std::string & fieldName, bool & value) = 0;
+	///bool <-> Json bool
+	void serializeBool(const std::string & fieldName, bool & value);
 
-	virtual void serializeBool(const std::string & fieldName, boost::logic::tribool & value) = 0;
+	///bool <-> Json bool
+	void serializeBool(const std::string & fieldName, boost::logic::tribool & value)
+	{
+		serializeInternal(fieldName, value);
+	};
 
 	///bool <-> Json string enum
 	virtual void serializeEnum(const std::string & fieldName, const std::string & trueValue, const std::string & falseValue, bool & value) = 0;
@@ -174,34 +173,39 @@ public:
 	///String <-> Json string
 	virtual void serializeString(const std::string & fieldName, std::string & value) = 0;
 
+	///si32-convertible enum <-> Json string enum
 	template <typename T>
 	void serializeNumericEnum(const std::string & fieldName, T & value, const std::vector<std::string> & enumMap)
 	{
 		doSerializeInternal<T, T, si32>(fieldName, value, boost::none, enumMap);
 	};
 
+	///si32-convertible enum <-> Json string enum
 	template <typename T>
 	void serializeNumericEnum(const std::string & fieldName, T & value, const T defaultValue, const std::vector<std::string> & enumMap)
 	{
 		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, enumMap);
 	};
 
+	///Anything double-convertible <-> Json double
 	template <typename T>
 	void serializeNumeric(const std::string & fieldName, T & value)
 	{
 		doSerializeInternal<T, T, double>(fieldName, value, boost::none);
 	};
 
+	///Anything double-convertible <-> Json double
 	template <typename T, typename U>
 	void serializeNumeric(const std::string & fieldName, T & value, const U & defaultValue)
 	{
 		doSerializeInternal<T, U, double>(fieldName, value, defaultValue);
 	};
 
+	///si32-convertible identifier <-> Json string
 	template <typename T>
 	void serializeId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const T & defaultValue, T & value)
 	{
-		doSerializeInternal<T,T,si32>(fieldName, value, defaultValue, decoder, encoder);
+		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, decoder, encoder);
 	}
 
 protected:
@@ -209,6 +213,9 @@ protected:
 	JsonNode * current;
 
 	JsonSerializeFormat(JsonNode & root_, const bool saving_);
+
+	///bool <-> Json bool, indeterminate is default
+	virtual void serializeInternal(const std::string & fieldName, boost::logic::tribool & value) = 0;
 
 	///Numeric Id <-> String Id
 	virtual void serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const TDecoder & decoder, const TEncoder & encoder) = 0;
