@@ -335,9 +335,6 @@
 			}
 		}
 	},
-	"predefinedHeroes" : {},
-	"teams" : [
-	],
 	"triggeredEvents" : {
 		"standardVictory" : {
 			"condition" : [

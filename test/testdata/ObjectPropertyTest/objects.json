@@ -5419,7 +5419,8 @@
 		"x" : 4,
 		"y" : 83,
 		"options" : {
-			"quest" : {}
+			"quest" : {},
+			"reward" : {}
 		}
 	},
 	"sign_197" : {
@@ -5486,7 +5487,8 @@
 		"x" : 6,
 		"y" : 83,
 		"options" : {
-			"quest" : {}
+			"quest" : {},
+			"reward" : {}
 		}
 	},
 	"seerHut_200" : {
@@ -5509,7 +5511,8 @@
 		"x" : 8,
 		"y" : 83,
 		"options" : {
-			"quest" : {}
+			"quest" : {},
+			"reward" : {}
 		}
 	},
 	"seerHut_201" : {
@@ -5541,9 +5544,9 @@
 				"player" : "red",
 				"timeLimit" : 28
 			},
-			"reward" : "diamondGolem",
-			"rewardType" : "creature",
-			"rewardValue" : 999
+			"reward" : {
+				"creature.diamondGolem" : 999
+			}
 		}
 	},
 	"questGuard_202" : {
@@ -6516,8 +6519,9 @@
 				"heroLevel" : 99,
 				"missionType" : "Level"
 			},
-			"rewardType" : "experience",
-			"rewardValue" : 100
+			"reward" : {
+				"experience" : 100
+			}
 		}
 	},
 	"sign_241" : {
@@ -6572,8 +6576,9 @@
 					"spellpower" : 3
 				}
 			},
-			"rewardType" : "manaPoints",
-			"rewardValue" : 999
+			"reward" : {
+				"mana" : 999
+			}
 		}
 	},
 	"seerHut_243" : {
@@ -6601,8 +6606,9 @@
 				"killTarget" : "prison_263",
 				"missionType" : "KillHero"
 			},
-			"rewardType" : "moraleBonus",
-			"rewardValue" : 3
+			"reward" : {
+				"morale" : 3
+			}
 		}
 	},
 	"sign_244" : {
@@ -6652,8 +6658,9 @@
 				"killTarget" : "monster_214",
 				"missionType" : "KillCreature"
 			},
-			"rewardType" : "luckBonus",
-			"rewardValue" : 2
+			"reward" : {
+				"luck" : 2
+			}
 		}
 	},
 	"sign_246" : {
@@ -6727,9 +6734,9 @@
 				],
 				"missionType" : "Artifact"
 			},
-			"reward" : "gold",
-			"rewardType" : "resources",
-			"rewardValue" : 99999
+			"reward" : {
+				"resource.gold" : 99999
+			}
 		}
 	},
 	"sign_249" : {
@@ -6894,9 +6901,9 @@
 				],
 				"missionType" : "Army"
 			},
-			"reward" : "knowledge",
-			"rewardType" : "primarySkill",
-			"rewardValue" : 99
+			"reward" : {
+				"primarySkill.knowledge" : 99
+			}
 		}
 	},
 	"seerHut_256" : {
@@ -6932,9 +6939,9 @@
 					"wood" : 10
 				}
 			},
-			"reward" : "necromancy",
-			"rewardType" : "secondarySkill",
-			"rewardValue" : 3
+			"reward" : {
+				"secondarySkill.necromancy" : 3
+			}
 		}
 	},
 	"seerHut_257" : {
@@ -6962,8 +6969,9 @@
 				"hero" : "catherine",
 				"missionType" : "Hero"
 			},
-			"reward" : "angelicAlliance",
-			"rewardType" : "artifact"
+			"reward" : {
+				"artifact.angelicAlliance" : 1
+			}
 		}
 	},
 	"seerHut_258" : {
@@ -6991,8 +6999,9 @@
 				"missionType" : "Player",
 				"player" : "purple"
 			},
-			"reward" : "fly",
-			"rewardType" : "spell"
+			"reward" : {
+				"spell.fly" : 1
+			}
 		}
 	},
 	"seerHut_259" : {
@@ -7029,9 +7038,9 @@
 				],
 				"missionType" : "Artifact"
 			},
-			"reward" : "cyclopKing",
-			"rewardType" : "creature",
-			"rewardValue" : 777
+			"reward" : {
+				"creature.cyclopKing" : 777
+			}
 		}
 	},
 	"seerHut_260" : {
@@ -7087,7 +7096,8 @@
 					}
 				],
 				"missionType" : "Army"
-			}
+			},
+			"reward" : {}
 		}
 	},
 	"sign_261" : {
