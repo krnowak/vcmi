@@ -14,8 +14,8 @@
 
 #include "../JsonNode.h"
 
-JsonSerializer::JsonSerializer(JsonNode & root_):
-	JsonSerializeFormat(root_, true)
+JsonSerializer::JsonSerializer(const IInstanceResolver * instanceResolver_, JsonNode & root_):
+	JsonSerializeFormat(instanceResolver_, root_, true)
 {
 
 }

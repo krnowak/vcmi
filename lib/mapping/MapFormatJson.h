@@ -17,6 +17,8 @@
 #include "../filesystem/CZipLoader.h"
 #include "../GameConstants.h"
 
+#include "../serializer/JsonSerializeFormat.h"
+
 class TriggeredEvent;
 struct TerrainTile;
 struct PlayerInfo;
@@ -39,6 +41,8 @@ public:
 	int fileVersionMajor;
 	int fileVersionMinor;
 protected:
+	friend class MapObjectResolver;
+	std::unique_ptr<IInstanceResolver> mapObjectResolver;
 
 	/** ptr to the map object which gets filled by data from the buffer or written to buffer */
 	CMap * map;
@@ -48,6 +52,9 @@ protected:
 	 * (when loading map and mapHeader point to the same object)
 	 */
 	CMapHeader * mapHeader;
+
+
+	CMapFormatJson();
 
 	void serializeAllowedFactions(JsonSerializeFormat & handler, std::set<TFaction> & value);
 

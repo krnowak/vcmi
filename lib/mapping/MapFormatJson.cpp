@@ -28,6 +28,65 @@
 #include "../serializer/JsonDeserializer.h"
 #include "../serializer/JsonSerializer.h"
 
+class MapObjectResolver: public IInstanceResolver
+{
+public:
+	MapObjectResolver(const CMapFormatJson * owner_);
+
+	si32 decode (const std::string & identifier) const override;
+	std::string encode(si32 identifier) const override;
+
+private:
+	const CMapFormatJson * owner;
+};
+
+MapObjectResolver::MapObjectResolver(const CMapFormatJson * owner_):
+	owner(owner_)
+{
+
+}
+
+si32 MapObjectResolver::decode(const std::string & identifier) const
+{
+	//always decode as ObjectInstanceID
+
+	auto it = owner->map->instanceNames.find(identifier);
+
+	if(it != owner->map->instanceNames.end())
+	{
+		return (*it).second->id.getNum();
+	}
+	else
+	{
+		logGlobal->errorStream() << "Object not found: " << identifier;
+		return -1;
+	}
+}
+
+std::string MapObjectResolver::encode(si32 identifier) const
+{
+	ObjectInstanceID id;
+
+	//use h3m questIdentifiers if they are present
+	if(owner->map->questIdentifierToId.empty())
+	{
+		id = ObjectInstanceID(identifier);
+	}
+	else
+	{
+		id = owner->map->questIdentifierToId[identifier];
+	}
+
+	si32 oid = id.getNum();
+	if(oid < 0  ||  oid >= owner->map->objects.size())
+	{
+        logGlobal->errorStream() << "Cannot get object with id " << oid;
+		return "";
+	}
+
+	return owner->map->objects[oid]->instanceName;
+}
+
 namespace HeaderDetail
 {
 	static const ui8 difficultyDefault = 1;//normal
@@ -165,6 +224,12 @@ const int CMapFormatJson::VERSION_MINOR = 0;
 
 const std::string CMapFormatJson::HEADER_FILE_NAME = "header.json";
 const std::string CMapFormatJson::OBJECTS_FILE_NAME = "objects.json";
+
+CMapFormatJson::CMapFormatJson():
+	mapObjectResolver(make_unique<MapObjectResolver>(this))
+{
+
+}
 
 void CMapFormatJson::serializeAllowedFactions(JsonSerializeFormat & handler, std::set<TFaction> & value)
 {
@@ -454,6 +519,7 @@ void CMapFormatJson::writeOptions(JsonSerializer & handler)
 
 ///CMapPatcher
 CMapPatcher::CMapPatcher(JsonNode stream):
+	CMapFormatJson(),
 	input(stream)
 {
 	//todo: update map patches and change this
@@ -471,13 +537,14 @@ void CMapPatcher::patchMapHeader(std::unique_ptr<CMapHeader> & header)
 
 void CMapPatcher::readPatchData()
 {
-	JsonDeserializer handler(input);
+	JsonDeserializer handler(mapObjectResolver.get(), input);
 	readTriggeredEvents(handler);
 }
 
 
 ///CMapLoaderJson
 CMapLoaderJson::CMapLoaderJson(CInputStream * stream):
+	CMapFormatJson(),
 	buffer(stream),
 	ioApi(new CProxyROIOApi(buffer)),
 	loader("", "_", ioApi)
@@ -561,7 +628,7 @@ void CMapLoaderJson::readHeader(const bool complete)
 		logGlobal->traceStream() << "Too new map format revision: " << fileVersionMinor << ". This map should work but some of map features may be ignored.";
 	}
 
-	JsonDeserializer handler(header);
+	JsonDeserializer handler(mapObjectResolver.get(), header);
 
 	mapHeader->version = EMapFormat::VCMI;//todo: new version field
 
@@ -793,7 +860,7 @@ void CMapLoaderJson::MapObjectLoader::configure()
 	if(nullptr == instance)
 		return;
 
-	JsonDeserializer handler(configuration);
+	JsonDeserializer handler(owner->mapObjectResolver.get(), configuration);
 
 	instance->serializeJson(handler);
 
@@ -851,6 +918,7 @@ void CMapLoaderJson::readObjects()
 
 ///CMapSaverJson
 CMapSaverJson::CMapSaverJson(CInputOutputStream * stream):
+	CMapFormatJson(),
 	buffer(stream),
 	ioApi(new CProxyIOApi(buffer)),
 	saver(ioApi, "_")
@@ -891,7 +959,7 @@ void CMapSaverJson::saveMap(const std::unique_ptr<CMap>& map)
 void CMapSaverJson::writeHeader()
 {
 	JsonNode header;
-	JsonSerializer handler(header);
+	JsonSerializer handler(mapObjectResolver.get(), header);
 
 	header["versionMajor"].Float() = VERSION_MAJOR;
 	header["versionMinor"].Float() = VERSION_MINOR;
@@ -981,7 +1049,7 @@ void CMapSaverJson::writeObjects()
 {
 	JsonNode data(JsonNode::DATA_STRUCT);
 
-	JsonSerializer handler(data);
+	JsonSerializer handler(mapObjectResolver.get(), data);
 
 	for(CGObjectInstance * obj : map->objects)
 	{

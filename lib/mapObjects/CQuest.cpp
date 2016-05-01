@@ -412,9 +412,6 @@ void CQuest::serializeJson(JsonSerializeFormat & handler, const std::string & fi
 {
 	auto q = handler.enterStruct(fieldName);
 
-	if(handler.saving)
-		handler.getCurrent().setType(JsonNode::DATA_STRUCT);
-
 	handler.serializeString("firstVisitText", firstVisitText);
 	handler.serializeString("nextVisitText", nextVisitText);
 	handler.serializeString("completedText", completedText);
@@ -452,10 +449,13 @@ void CQuest::serializeJson(JsonSerializeFormat & handler, const std::string & fi
 		}
 		break;
 	case MISSION_KILL_HERO:
-		break;
 	case MISSION_KILL_CREATURE:
+		handler.serializeInstance<ui32>("killTarget", m13489val, ui32(-1));
 		break;
 	case MISSION_ART:
+		//todo: ban artifacts
+
+
 		break;
 	case MISSION_ARMY:
 		break;

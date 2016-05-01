@@ -15,6 +15,13 @@ class JsonSerializeFormat;
 class JsonStructSerializer;
 class JsonArraySerializer;
 
+class IInstanceResolver
+{
+public:
+	virtual si32 decode(const std::string & identifier) const = 0;
+	virtual std::string encode(si32 identifier) const = 0;
+};
+
 class JsonSerializeHelper: public boost::noncopyable
 {
 public:
@@ -208,11 +215,21 @@ public:
 		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, decoder, encoder);
 	}
 
+	///si32-convertible instance identifier <-> Json string
+	template <typename T>
+	void serializeInstance(const std::string & fieldName, T & value, const T & defaultValue)
+	{
+		const TDecoder decoder = std::bind(&IInstanceResolver::decode, instanceResolver, _1);
+		const TEncoder endoder = std::bind(&IInstanceResolver::encode, instanceResolver, _1);
+
+		serializeId<T>(fieldName, value, defaultValue, decoder, endoder);
+	}
+
 protected:
 	JsonNode * root;
 	JsonNode * current;
 
-	JsonSerializeFormat(JsonNode & root_, const bool saving_);
+	JsonSerializeFormat(const IInstanceResolver * instanceResolver_, JsonNode & root_, const bool saving_);
 
 	///bool <-> Json bool, indeterminate is default
 	virtual void serializeInternal(const std::string & fieldName, boost::logic::tribool & value) = 0;
@@ -227,6 +244,8 @@ protected:
 	virtual void serializeInternal(const std::string & fieldName, si32 & value, const boost::optional<si32> & defaultValue, const std::vector<std::string> & enumMap) = 0;
 
 private:
+	const IInstanceResolver * instanceResolver;
+
     template <typename VType, typename DVType, typename IType, typename... Args>
     void doSerializeInternal(const std::string & fieldName, VType & value, const boost::optional<DVType> & defaultValue, Args ... args)
     {

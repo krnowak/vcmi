@@ -125,7 +125,8 @@ JsonSerializeFormat::LICSet::LICSet(const std::set<si32>& Standard, const TDecod
 
 
 //JsonSerializeFormat
-JsonSerializeFormat::JsonSerializeFormat(JsonNode & root_, const bool saving_):
+JsonSerializeFormat::JsonSerializeFormat(const IInstanceResolver * instanceResolver_, JsonNode & root_, const bool saving_):
+	instanceResolver(instanceResolver_),
 	saving(saving_),
 	root(&root_),
 	current(root)

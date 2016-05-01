@@ -14,8 +14,8 @@
 
 #include "../JsonNode.h"
 
-JsonDeserializer::JsonDeserializer(JsonNode & root_):
-	JsonSerializeFormat(root_, false)
+JsonDeserializer::JsonDeserializer(const IInstanceResolver * instanceResolver_, JsonNode & root_):
+	JsonSerializeFormat(instanceResolver_, root_, false)
 {
 
 }
@@ -77,8 +77,6 @@ void JsonDeserializer::serializeInternal(const std::string & fieldName, si32 & v
 void JsonDeserializer::serializeLIC(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const std::vector<bool> & standard, std::vector<bool> & value)
 {
 	const JsonNode & field = current->operator[](fieldName);
-	if(field.isNull())
-		return;
 
 	const JsonNode & anyOf = field["anyOf"];
 	const JsonNode & allOf = field["allOf"];

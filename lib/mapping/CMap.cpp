@@ -572,7 +572,7 @@ void CMap::addNewObject(CGObjectInstance * obj)
 
 	auto it = instanceNames.find(obj->instanceName);
 	if(it != instanceNames.end())
-		throw std::runtime_error("Object instance name duplicated:"+obj->instanceName);
+		throw std::runtime_error("Object instance name duplicated: "+obj->instanceName);
 
     objects.push_back(obj);
     instanceNames[obj->instanceName] = obj;
