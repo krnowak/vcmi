@@ -638,7 +638,8 @@ void CStackInstance::setType(const CCreature *c)
 			experience *= VLC->creh->expAfterUpgrade / 100.0;
 	}
 
-	type = c;
+	CStackBasicDescriptor::setType(c);
+
 	if(type)
 		attachTo(const_cast<CCreature*>(type));
 }
@@ -858,6 +859,11 @@ CStackBasicDescriptor::CStackBasicDescriptor(const CCreature *c, TQuantity Count
 {
 }
 
+void CStackBasicDescriptor::setType(const CCreature * c)
+{
+	type = c;
+}
+
 void CStackBasicDescriptor::writeJson(JsonNode& json) const
 {
 	json.setType(JsonNode::DATA_STRUCT);
@@ -870,7 +876,7 @@ void CStackBasicDescriptor::readJson(const JsonNode& json)
 {
 	auto typeName = json["type"].String();
 	if(typeName != "")
-		type = VLC->creh->getCreature("core", json["type"].String());
+		setType(VLC->creh->getCreature("core", json["type"].String()));
 	count = json["amount"].Float();
 }
 

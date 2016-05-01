@@ -31,6 +31,8 @@ public:
 	CStackBasicDescriptor(CreatureID id, TQuantity Count);
 	CStackBasicDescriptor(const CCreature *c, TQuantity Count);
 
+	virtual void setType(const CCreature * c);
+
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
 		h & type & count;
@@ -87,7 +89,7 @@ public:
 	~CStackInstance();
 
 	void setType(CreatureID creID);
-	void setType(const CCreature *c);
+	void setType(const CCreature * c) override;
 	void setArmyObj(const CArmedInstance *ArmyObj);
 	virtual void giveStackExp(TExpType exp);
 	bool valid(bool allowUnrandomized) const;
