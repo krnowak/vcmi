@@ -203,7 +203,7 @@ public:
 
 	///si32-convertible identifier <-> Json string
 	template <typename T>
-	void serializeId(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const T & defaultValue, T & value)
+	void serializeId(const std::string & fieldName, T & value, const T & defaultValue, const TDecoder & decoder, const TEncoder & encoder)
 	{
 		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, decoder, encoder);
 	}

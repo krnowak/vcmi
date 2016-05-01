@@ -1535,7 +1535,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 			patrol.patrolRadius = (rawPatrolRadius > NO_PATROLING) ? rawPatrolRadius : 0;
 		}
 	}
-	handler.serializeId<si32>("portrait", &VLC->heroh->decodeHero, &VLC->heroh->encodeHero, UNINITIALIZED_PORTRAIT, portrait);
+	handler.serializeId<si32>("portrait", portrait, UNINITIALIZED_PORTRAIT, &VLC->heroh->decodeHero, &VLC->heroh->encodeHero);
 
 	{
 		if(handler.saving)
