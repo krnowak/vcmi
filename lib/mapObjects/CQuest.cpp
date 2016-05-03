@@ -454,10 +454,10 @@ void CQuest::serializeJson(JsonSerializeFormat & handler, const std::string & fi
 		break;
 	case MISSION_ART:
 		//todo: ban artifacts
-
-
+		handler.serializeIdArray("artifacts", m5arts, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
 		break;
 	case MISSION_ARMY:
+
 		break;
 	case MISSION_RESOURCES:
 		break;

@@ -1472,7 +1472,7 @@ bool CGHeroInstance::hasVisions(const CGObjectInstance * target, const int subty
 	return (distance < visionsRange) && (target->pos.z == pos.z);
 }
 
-void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
+void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat & handler)
 {
 	serializeJsonOwner(handler);
 
@@ -1535,7 +1535,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat& handler)
 			patrol.patrolRadius = (rawPatrolRadius > NO_PATROLING) ? rawPatrolRadius : 0;
 		}
 	}
-	handler.serializeId<si32>("portrait", portrait, UNINITIALIZED_PORTRAIT, &VLC->heroh->decodeHero, &VLC->heroh->encodeHero);
+	handler.serializeId<si32>("portrait", portrait, -1, &VLC->heroh->decodeHero, &VLC->heroh->encodeHero);
 
 	{
 		if(handler.saving)

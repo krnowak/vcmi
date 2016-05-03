@@ -85,6 +85,8 @@ public:
 	///may assume that object index is valid
 	typedef std::function<std::string(si32)> TEncoder;
 
+	typedef std::function<void(JsonSerializeFormat &)> TSerialize;
+
 	struct LIC
 	{
 		LIC(const std::vector<bool> & Standard, const TDecoder Decoder, const TEncoder Encoder);
@@ -213,6 +215,23 @@ public:
 	void serializeId(const std::string & fieldName, T & value, const T & defaultValue, const TDecoder & decoder, const TEncoder & encoder)
 	{
 		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, decoder, encoder);
+	}
+
+	///si32-convertible identifier vector <-> Json array of string
+	template <typename T>
+	void serializeIdArray(const std::string & fieldName, std::vector<T> & value, const TDecoder & decoder, const TEncoder & encoder)
+	{
+		if(saving)
+		{
+			if(!value.empty())
+			{
+				auto a = enterArray(fieldName);
+			}
+		}
+		else
+		{
+
+		}
 	}
 
 	///si32-convertible instance identifier <-> Json string

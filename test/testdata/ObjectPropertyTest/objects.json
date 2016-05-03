@@ -5968,7 +5968,7 @@
 		"y" : 83,
 		"options" : {
 			"quest" : {
-				"army" : [
+				"creatures" : [
 					{
 						"amount" : 1,
 						"type" : "azureDragon"
@@ -6893,7 +6893,7 @@
 		"y" : 86,
 		"options" : {
 			"quest" : {
-				"army" : [
+				"creatures" : [
 					{
 						"amount" : 100,
 						"type" : "archer"
@@ -7065,7 +7065,7 @@
 		"y" : 86,
 		"options" : {
 			"quest" : {
-				"army" : [
+				"creatures" : [
 					{
 						"amount" : 1,
 						"type" : "pikeman"
