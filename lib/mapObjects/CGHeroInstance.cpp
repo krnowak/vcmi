@@ -1509,7 +1509,8 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat & handler)
 	CCreatureSet::serializeJson(handler, "army");
 	handler.serializeBool<ui8>("tightFormation", formation, 1, 0, 0);
 
-	CArtifactSet::serializeJson(handler, "artifacts");//todo:CArtifactSet::serializeJson
+	if(handler.saving)
+		CArtifactSet::serializeJsonArtifacts(handler, "artifacts", nullptr);
 
 	handler.serializeString("biography", biography);
 	//FIXME: JsonNode need int64 support
@@ -1535,7 +1536,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat & handler)
 			patrol.patrolRadius = (rawPatrolRadius > NO_PATROLING) ? rawPatrolRadius : 0;
 		}
 	}
-	handler.serializeId<si32>("portrait", portrait, -1, &VLC->heroh->decodeHero, &VLC->heroh->encodeHero);
+	handler.serializeId("portrait", portrait, -1, &VLC->heroh->decodeHero, &VLC->heroh->encodeHero);
 
 	{
 		if(handler.saving)

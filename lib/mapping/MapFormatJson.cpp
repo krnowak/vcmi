@@ -864,10 +864,11 @@ void CMapLoaderJson::MapObjectLoader::configure()
 
 	instance->serializeJson(handler);
 
+	//artifact instance serialization requires access to Map object, handle it here for now
+	//todo: find better solution for artifact instance serialization
+
 	if(auto art = dynamic_cast<CGArtifact *>(instance))
 	{
-		//todo: find better place for this code
-
 		int artID = ArtifactID::NONE;
 		int spellID = -1;
 
@@ -888,6 +889,13 @@ void CMapLoaderJson::MapObjectLoader::configure()
 		}
 
 		art->storedArtifact = CArtifactInstance::createArtifact(owner->map, artID, spellID);
+	}
+
+	if(auto hero = dynamic_cast<CGHeroInstance *>(instance))
+	{
+        auto o = handler.enterStruct("options");
+
+        hero->serializeJsonArtifacts(handler, "artifacts", owner->map);
 	}
 }
 

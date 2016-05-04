@@ -200,7 +200,7 @@ public:
 	void initHero();
 	void initHero(HeroTypeID SUBID);
 
-	void putArtifact(ArtifactPosition pos, CArtifactInstance *art);
+	void putArtifact(ArtifactPosition pos, CArtifactInstance * art) override;
 	void putInBackpack(CArtifactInstance *art);
 	void initExp();
 	void initArmy(IArmyDescriptor *dst = nullptr);

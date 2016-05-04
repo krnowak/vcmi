@@ -1390,7 +1390,107 @@ void CArtifactSet::artDeserializationFix(CBonusSystemNode *node)
 			node->attachTo(elem.second.artifact);
 }
 
-void CArtifactSet::serializeJson(JsonSerializeFormat& handler, const std::string& fieldName)
+void CArtifactSet::serializeJsonArtifacts(JsonSerializeFormat & handler, const std::string & fieldName, CMap * map)
 {
+	//todo: creature and commander artifacts
+    if(handler.saving && artifactsInBackpack.empty() && artifactsWorn.empty())
+		return;
 
+	if(!handler.saving)
+	{
+		assert(map);
+		artifactsInBackpack.clear();
+		artifactsWorn.clear();
+	}
+
+	auto s = handler.enterStruct(fieldName);
+
+	switch(bearerType())
+	{
+	case ArtBearer::HERO:
+		serializeJsonHero(handler, map);
+		break;
+	case ArtBearer::CREATURE:
+		serializeJsonCreature(handler, map);
+		break;
+	case ArtBearer::COMMANDER:
+		serializeJsonCommander(handler, map);
+		break;
+	default:
+		assert(false);
+		break;
+	}
+}
+
+void CArtifactSet::serializeJsonHero(JsonSerializeFormat & handler, CMap * map)
+{
+	for(ArtifactPosition ap = ArtifactPosition::HEAD; ap < ArtifactPosition::AFTER_LAST; ap.advance(1))
+	{
+		serializeJsonSlot(handler, ap, map);
+	}
+
+	std::vector<ArtifactID> backpackTemp;
+
+	if(handler.saving)
+	{
+		backpackTemp.reserve(artifactsInBackpack.size());
+        for(const ArtSlotInfo & info : artifactsInBackpack)
+			backpackTemp.push_back(info.artifact->artType->id);
+	}
+	handler.serializeIdArray(NArtifactPosition::backpack, backpackTemp, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
+	if(!handler.saving)
+	{
+        for(const ArtifactID & artifactID : backpackTemp)
+		{
+			auto artifact = CArtifactInstance::createArtifact(map, artifactID.toEnum());
+			auto slot = ArtifactPosition(GameConstants::BACKPACK_START + artifactsInBackpack.size());
+			if(artifact->canBePutAt(this, slot))
+				putArtifact(slot, artifact);
+		}
+	}
+}
+
+void CArtifactSet::serializeJsonCreature(JsonSerializeFormat & handler, CMap * map)
+{
+	logGlobal->error("CArtifactSet::serializeJsonCreature not implemented");
+}
+
+void CArtifactSet::serializeJsonCommander(JsonSerializeFormat & handler, CMap * map)
+{
+	logGlobal->error("CArtifactSet::serializeJsonCommander not implemented");
+}
+
+void CArtifactSet::serializeJsonSlot(JsonSerializeFormat & handler, const ArtifactPosition & slot, CMap * map)
+{
+	ArtifactID artifactID;
+
+	if(handler.saving)
+	{
+		const ArtSlotInfo * info = getSlot(slot);
+
+		if(info != nullptr && !info->locked)
+		{
+			artifactID = info->artifact->artType->id;
+
+            handler.serializeId(NArtifactPosition::namesHero[slot.num], artifactID, ArtifactID::NONE, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
+		}
+	}
+	else
+	{
+		handler.serializeId(NArtifactPosition::namesHero[slot.num], artifactID, ArtifactID::NONE, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
+
+		if(artifactID != ArtifactID::NONE)
+		{
+			auto artifact = CArtifactInstance::createArtifact(map, artifactID.toEnum());
+
+			if(artifact->canBePutAt(this, slot))
+			{
+				putArtifact(slot, artifact);
+			}
+			else
+			{
+				logGlobal->debugStream() << "Artifact can't be put at the specified location."; //TODO add more debugging information
+			}
+		}
+	}
 }

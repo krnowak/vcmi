@@ -1426,7 +1426,7 @@ void CGArtifact::serializeJsonOptions(JsonSerializeFormat& handler)
 		const Bonus * b = storedArtifact->getBonusLocalFirst(Selector::type(Bonus::SPELL));
 		SpellID spellId(b->subtype);
 
-		handler.serializeId("spell", spellId, SpellID(SpellID::NONE), &CSpellHandler::decodeSpell, &CSpellHandler::encodeSpell);
+		handler.serializeId("spell", spellId, SpellID::NONE, &CSpellHandler::decodeSpell, &CSpellHandler::encodeSpell);
 	}
 }
 
@@ -1655,7 +1655,7 @@ std::string CGShrine::getHoverText(const CGHeroInstance * hero) const
 
 void CGShrine::serializeJsonOptions(JsonSerializeFormat& handler)
 {
-	handler.serializeId("spell", spell, SpellID(SpellID::NONE), &CSpellHandler::decodeSpell, &CSpellHandler::encodeSpell);
+	handler.serializeId("spell", spell, SpellID::NONE, &CSpellHandler::decodeSpell, &CSpellHandler::encodeSpell);
 }
 
 void CGSignBottle::initObj()

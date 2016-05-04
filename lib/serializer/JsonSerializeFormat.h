@@ -246,10 +246,10 @@ public:
 	};
 
 	///si32-convertible identifier <-> Json string
-	template <typename T>
-	void serializeId(const std::string & fieldName, T & value, const T & defaultValue, const TDecoder & decoder, const TEncoder & encoder)
+	template <typename T, typename U>
+	void serializeId(const std::string & fieldName, T & value, const U & defaultValue, const TDecoder & decoder, const TEncoder & encoder)
 	{
-		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, decoder, encoder);
+		doSerializeInternal<T, U, si32>(fieldName, value, defaultValue, decoder, encoder);
 	}
 
 	///si32-convertible identifier vector <-> Json array of string

@@ -12,6 +12,7 @@
 #include "CHeroHandler.h"
 #include "IBonusTypeHandler.h"
 #include "serializer/JsonSerializeFormat.h"
+#include "NetPacksBase.h"
 
 /*
  * CCreatureSet.cpp, part of VCMI engine
@@ -749,8 +750,15 @@ ArtBearer::ArtBearer CStackInstance::bearerType() const
 	return ArtBearer::CREATURE;
 }
 
+void CStackInstance::putArtifact(ArtifactPosition pos, CArtifactInstance * art)
+{
+	assert(!getArt(pos));
+	art->putAt(ArtifactLocation(this, pos));
+}
+
 void CStackInstance::serializeJson(JsonSerializeFormat & handler)
 {
+	//todo: artifacts
 	CStackBasicDescriptor::serializeJson(handler);//must be first
 
 	if(handler.saving)

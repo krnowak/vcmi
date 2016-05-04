@@ -2692,8 +2692,6 @@
 				{}
 			],
 			"artifacts" : {
-				"backpack" : [
-				],
 				"feet" : "bootsOfLevitation",
 				"spellbook" : "spellBook"
 			},
@@ -7290,8 +7288,6 @@
 		"y" : 22,
 		"options" : {
 			"artifacts" : {
-				"backpack" : [
-				],
 				"head" : "admiralsHat",
 				"leftHand" : "shieldOfTheDamned",
 				"rightHand" : "armageddonsBlade",
