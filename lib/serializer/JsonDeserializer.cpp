@@ -51,6 +51,22 @@ void JsonDeserializer::serializeInternal(const std::string & fieldName, si32 & v
 	}
 }
 
+void JsonDeserializer::serializeInternal(const std::string & fieldName, std::vector<si32> & value, const TDecoder & decoder, const TEncoder & encoder)
+{
+	const JsonVector & data = current->operator[](fieldName).Vector();
+
+	value.clear();
+	value.reserve(data.size());
+
+	for(const JsonNode elem : data)
+	{
+		si32 rawId = decoder(elem.String());
+
+		if(rawId >= 0)
+			value.push_back(rawId);
+	}
+}
+
 void JsonDeserializer::serializeInternal(const std::string & fieldName, double & value, const boost::optional<double> & defaultValue)
 {
 	const JsonNode & data = current->operator[](fieldName);

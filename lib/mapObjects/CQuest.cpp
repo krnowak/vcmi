@@ -433,7 +433,7 @@ void CQuest::serializeJson(JsonSerializeFormat & handler, const std::string & fi
 
 	switch (missionType)
 	{
-	case MISSION_NONE :
+	case MISSION_NONE:
 		break;
 	case MISSION_LEVEL:
 		handler.serializeNumeric("heroLevel", m13489val, -1);
@@ -457,16 +457,32 @@ void CQuest::serializeJson(JsonSerializeFormat & handler, const std::string & fi
 		handler.serializeIdArray("artifacts", m5arts, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
 		break;
 	case MISSION_ARMY:
-
+        {
+			auto a = handler.enterArray("creatures");
+			a.serializeStruct(m6creatures);
+        }
 		break;
 	case MISSION_RESOURCES:
+        {
+        	auto r = handler.enterStruct("resources");
+
+        	if(!handler.saving)
+				m7resources.resize(GameConstants::RESOURCE_QUANTITY-1);
+
+			for(size_t idx = 0; idx < (GameConstants::RESOURCE_QUANTITY - 1); idx++)
+			{
+				handler.serializeNumeric(GameConstants::RESOURCE_NAMES[idx], m7resources[idx], 0);
+			}
+        }
 		break;
 	case MISSION_HERO:
+		handler.serializeId<ui32>("hero", m13489val, 0, &CHeroHandler::decodeHero, &CHeroHandler::encodeHero);
 		break;
 	case MISSION_PLAYER:
+		handler.serializeNumericEnum("player",  m13489val, PlayerColor::CANNOT_DETERMINE.getNum(), GameConstants::PLAYER_COLOR_NAMES);
 		break;
-
 	default:
+		logGlobal->error("Invalid quest mission type");
 		break;
 	}
 
@@ -813,6 +829,10 @@ void CGSeerHut::serializeJsonOptions(JsonSerializeFormat & handler)
 {
 	//quest and reward
 	quest->serializeJson(handler, "quest");
+
+	{
+		auto s = handler.enterStruct("reward");
+	}
 }
 
 void CGQuestGuard::init()

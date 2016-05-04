@@ -52,6 +52,22 @@ void JsonSerializer::serializeInternal(const std::string & fieldName, si32 & val
 		current->operator[](fieldName).String() = enumMap.at(value);
 }
 
+void JsonSerializer::serializeInternal(const std::string & fieldName, std::vector<si32> & value, const TDecoder & decoder, const TEncoder & encoder)
+{
+	if(value.empty())
+		return;
+
+	JsonVector & data = current->operator[](fieldName).Vector();
+	data.reserve(value.size());
+
+	for(const si32 rawId : value)
+	{
+        JsonNode jsonElement(JsonNode::DATA_STRING);
+        jsonElement.String() = encoder(rawId);
+        data.push_back(std::move(jsonElement));
+	}
+}
+
 void JsonSerializer::serializeLIC(const std::string & fieldName, const TDecoder & decoder, const TEncoder & encoder, const std::vector<bool> & standard, std::vector<bool> & value)
 {
 	assert(standard.size() == value.size());

@@ -38,9 +38,7 @@ public:
 		h & type & count;
 	}
 
-	void writeJson(JsonNode & json) const;
-
-	void readJson(const JsonNode & json);
+	void serializeJson(JsonSerializeFormat & handler);
 };
 
 class DLL_LINKAGE CStackInstance : public CBonusSystemNode, public CStackBasicDescriptor, public CArtifactSet
@@ -66,9 +64,7 @@ public:
 		BONUS_TREE_DESERIALIZATION_FIX
 	}
 
-	void writeJson(JsonNode & json) const;
-
-	void readJson(const JsonNode & json);
+	void serializeJson(JsonSerializeFormat & handler);
 
 	//overrides CBonusSystemNode
 	std::string bonusToString(const Bonus *bonus, bool description) const override; // how would bonus description look for this particular type of node

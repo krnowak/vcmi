@@ -488,7 +488,8 @@ void CCreatureSet::serializeJson(JsonSerializeFormat & handler, const std::strin
 	if(handler.saving && stacks.empty())
 		return;
 
-	JsonNode & json = handler.getCurrent()[fieldName];
+	auto a = handler.enterArray(fieldName);
+
 
 	if(handler.saving)
 	{
@@ -500,28 +501,28 @@ void CCreatureSet::serializeJson(JsonSerializeFormat & handler, const std::strin
 		if(fixedSize)
 			vstd::amax(sz, fixedSize.get());
 
-		json.Vector().resize(sz);
-
-		for(auto & elem : json.Vector())
-			elem.setType(JsonNode::DATA_STRUCT);
+		a.resize(sz, JsonNode::DATA_STRUCT);
 
 		for(const auto & p : stacks)
 		{
-			JsonNode stack_node;
-			p.second->writeJson(stack_node);
-			json.Vector()[p.first.getNum()] = stack_node;
+			auto s = a.enterStruct(p.first.getNum());
+			p.second->serializeJson(handler);
 		}
 	}
 	else
 	{
-		for(size_t idx = 0; idx < json.Vector().size(); idx++)
+		for(size_t idx = 0; idx < a.size(); idx++)
 		{
-			if(json.Vector()[idx]["amount"].Float() > 0)
+			auto s = a.enterStruct(idx);
+
+			TQuantity amount = 0;
+
+			handler.serializeNumeric("amount", amount);
+
+			if(amount > 0)
 			{
 				CStackInstance * new_stack = new CStackInstance();
-
-				new_stack->readJson(json.Vector()[idx]);
-
+				new_stack->serializeJson(handler);
 				putStack(SlotID(idx), new_stack);
 			}
 		}
@@ -748,23 +749,37 @@ ArtBearer::ArtBearer CStackInstance::bearerType() const
 	return ArtBearer::CREATURE;
 }
 
-void CStackInstance::writeJson(JsonNode& json) const
+void CStackInstance::serializeJson(JsonSerializeFormat & handler)
 {
-	if(idRand > -1)
-	{
-		json["level"].Float() = (int)idRand / 2;
-		json["upgraded"].Bool() = (idRand % 2) > 0;
-	}
-	CStackBasicDescriptor::writeJson(json);
-}
+	CStackBasicDescriptor::serializeJson(handler);//must be first
 
-void CStackInstance::readJson(const JsonNode& json)
-{
-	if(json["type"].String() == "")
+	if(handler.saving)
 	{
-		idRand = json["level"].Float() * 2 + (int)json["upgraded"].Bool();
+		if(idRand > -1)
+		{
+			int level = (int)idRand / 2;
+
+			boost::logic::tribool upgraded = (idRand % 2) > 0;
+
+            handler.serializeNumeric("level", level, 0);
+            handler.serializeBool("upgraded", upgraded);
+		}
 	}
-	CStackBasicDescriptor::readJson(json);
+	else
+	{
+		//type set by CStackBasicDescriptor::serializeJson
+		if(type == nullptr)
+		{
+			int level = 0;
+
+			bool upgraded = false;
+
+            handler.serializeNumeric("level", level, 0);
+            handler.serializeBool("upgraded", upgraded);
+
+            idRand = level * 2 + (int)(bool)upgraded;
+		}
+	}
 }
 
 CCommanderInstance::CCommanderInstance()
@@ -864,20 +879,25 @@ void CStackBasicDescriptor::setType(const CCreature * c)
 	type = c;
 }
 
-void CStackBasicDescriptor::writeJson(JsonNode& json) const
+void CStackBasicDescriptor::serializeJson(JsonSerializeFormat & handler)
 {
-	json.setType(JsonNode::DATA_STRUCT);
-	if(type)
-		json["type"].String() = type->identifier;
-	json["amount"].Float() = count;
-}
+	handler.serializeNumeric("amount", count);
 
-void CStackBasicDescriptor::readJson(const JsonNode& json)
-{
-	auto typeName = json["type"].String();
-	if(typeName != "")
-		setType(VLC->creh->getCreature("core", json["type"].String()));
-	count = json["amount"].Float();
+	if(handler.saving)
+	{
+		if(type)
+		{
+			std::string typeName = type->identifier;
+			handler.serializeString("type", typeName);
+		}
+	}
+	else
+	{
+		std::string typeName("");
+		handler.serializeString("type", typeName);
+		if(typeName != "")
+			setType(VLC->creh->getCreature("core", typeName));
+	}
 }
 
 DLL_LINKAGE std::ostream & operator<<(std::ostream & str, const CStackInstance & sth)

@@ -620,9 +620,6 @@ void CGCreature::serializeJsonOptions(JsonSerializeFormat & handler)
 					handler.getCurrent()["rewardResources"][GameConstants::RESOURCE_NAMES[idx]].Float() = amount;
 			}
 		}
-
-		auto tmp = (gainedArtifact == ArtifactID(ArtifactID::NONE) ? "" : gainedArtifact.toArtifact()->identifier);
-		handler.serializeString("rewardArtifact", tmp);
 	}
 	else
 	{
@@ -636,19 +633,8 @@ void CGCreature::serializeJsonOptions(JsonSerializeFormat & handler)
 			TResources tmp(handler.getCurrent()["rewardResources"]);
 			std::swap(tmp,resources);
 		}
-		{
-			gainedArtifact = ArtifactID(ArtifactID::NONE);
-			std::string tmp;
-			handler.serializeString("rewardArtifact", tmp);
-
-			if(tmp != "")
-			{
-				auto artid = VLC->modh->identifiers.getIdentifier("core", "artifact", tmp);
-				if(artid)
-					gainedArtifact = ArtifactID(artid.get());
-			}
-		}
 	}
+	handler.serializeId("rewardArtifact", gainedArtifact, ArtifactID(ArtifactID::NONE), &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
 	handler.serializeBool("noGrowing", notGrowingTeam);
 	handler.serializeBool("neverFlees", neverFlees);
 	handler.serializeString("rewardMessage", message);
