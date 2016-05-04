@@ -908,9 +908,11 @@ void CGSeerHut::serializeJsonOptions(JsonSerializeFormat & handler)
 			assert(false);
 			break;
 		}
-		fullIdentifier = CModHandler::makeFullIdentifier(scope, metaTypeName, identifier);
-
-		handler.serializeNumeric(fullIdentifier, amount);
+		if(rewardType != NOTHING)
+		{
+			fullIdentifier = CModHandler::makeFullIdentifier(scope, metaTypeName, identifier);
+			handler.serializeNumeric(fullIdentifier, amount);
+		}
 	}
 	else
 	{
