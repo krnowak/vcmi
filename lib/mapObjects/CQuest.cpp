@@ -20,8 +20,12 @@
 #include "MiscObjects.h"
 #include "../IGameCallback.h"
 #include "../CGameState.h"
-#include "../StringConstants.h"
 #include "../serializer/JsonSerializeFormat.h"
+#include "../CModHandler.h"
+#include "../GameConstants.h"
+#include "../StringConstants.h"
+#include "../spells/CSpellHandler.h"
+
 
 std::map <PlayerColor, std::set <ui8> > CGKeys::playerKeyMap;
 
@@ -827,11 +831,158 @@ void CGSeerHut::blockingDialogAnswered(const CGHeroInstance *hero, ui32 answer) 
 
 void CGSeerHut::serializeJsonOptions(JsonSerializeFormat & handler)
 {
+	static const std::map<ERewardType, std::string> REWARD_MAP =
+	{
+        {NOTHING,		""},
+        {EXPERIENCE,	"experience"},
+        {MANA_POINTS,	"mana"},
+        {MORALE_BONUS,	"morale"},
+        {LUCK_BONUS,	"luck"},
+        {RESOURCES,		"resource"},
+		{PRIMARY_SKILL,	"primarySkill"},
+		{SECONDARY_SKILL,"secondarySkill"},
+		{ARTIFACT,		"artifact"},
+		{SPELL,			"spell"},
+		{CREATURE,		"creature"}
+	};
+
+	static const std::map<std::string, ERewardType> REWARD_RMAP =
+	{
+        {"experience",    EXPERIENCE},
+        {"mana",          MANA_POINTS},
+        {"morale",        MORALE_BONUS},
+        {"luck",          LUCK_BONUS},
+        {"resource",      RESOURCES},
+		{"primarySkill",  PRIMARY_SKILL},
+		{"secondarySkill",SECONDARY_SKILL},
+		{"artifact",      ARTIFACT},
+		{"spell",         SPELL},
+		{"creature",      CREATURE}
+	};
+
 	//quest and reward
 	quest->serializeJson(handler, "quest");
 
+	//only one reward is supported
+	//todo: full reward format support after CRewardInfo integration
+
+	auto s = handler.enterStruct("reward");
+	std::string fullIdentifier, metaTypeName, scope, identifier;
+
+	if(handler.saving)
 	{
-		auto s = handler.enterStruct("reward");
+		si32 amount = rVal;
+
+		metaTypeName = REWARD_MAP.at(rewardType);
+		switch (rewardType)
+		{
+		case NOTHING:
+			break;
+		case EXPERIENCE:
+		case MANA_POINTS:
+		case MORALE_BONUS:
+		case LUCK_BONUS:
+			identifier = "";
+			break;
+		case RESOURCES:
+			identifier = GameConstants::RESOURCE_NAMES[rID];
+			break;
+		case PRIMARY_SKILL:
+			identifier = PrimarySkill::names[rID];
+			break;
+		case SECONDARY_SKILL:
+			identifier = NSecondarySkill::names[rID];
+			break;
+		case ARTIFACT:
+			identifier = ArtifactID(rID).toArtifact()->identifier;
+			amount = 1;
+			break;
+		case SPELL:
+			identifier = SpellID(rID).toSpell()->identifier;
+			amount = 1;
+			break;
+		case CREATURE:
+			identifier = CreatureID(rID).toCreature()->identifier;
+			break;
+		default:
+			assert(false);
+			break;
+		}
+		fullIdentifier = CModHandler::makeFullIdentifier(scope, metaTypeName, identifier);
+
+		handler.serializeNumeric(fullIdentifier, amount);
+	}
+	else
+	{
+		rewardType = NOTHING;
+
+		const JsonNode & rewardsJson = handler.getCurrent();
+
+		fullIdentifier = "";
+
+		if(rewardsJson.Struct().empty())
+			return;
+		else
+		{
+			auto iter = rewardsJson.Struct().begin();
+			fullIdentifier = iter->first;
+		}
+
+		CModHandler::parseIdentifier(fullIdentifier, scope, metaTypeName, identifier);
+
+		auto it = REWARD_RMAP.find(metaTypeName);
+
+		if(it == REWARD_RMAP.end())
+		{
+			logGlobal->errorStream() << instanceName << ": invalid metatype in reward item " << fullIdentifier;
+			return;
+		}
+		else
+		{
+			rewardType = it->second;
+		}
+
+		bool doRequest = false;
+
+		switch (rewardType)
+		{
+		case NOTHING:
+			return;
+		case EXPERIENCE:
+		case MANA_POINTS:
+		case MORALE_BONUS:
+		case LUCK_BONUS:
+			break;
+		case PRIMARY_SKILL:
+			doRequest = true;
+			break;
+		case RESOURCES:
+		case SECONDARY_SKILL:
+		case ARTIFACT:
+		case SPELL:
+		case CREATURE:
+			doRequest = true;
+			break;
+		default:
+			assert(false);
+			break;
+		}
+
+		if(doRequest)
+		{
+			auto rawId = VLC->modh->identifiers.getIdentifier("core", fullIdentifier, false);
+
+			if(rawId)
+			{
+				rID = rawId.get();
+			}
+			else
+			{
+				rewardType = NOTHING;//fallback in case of error
+				return;
+			}
+		}
+		handler.serializeNumeric(fullIdentifier, rVal);
 	}
 }
 

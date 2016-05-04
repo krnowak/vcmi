@@ -85,6 +85,7 @@ public:
 	boost::optional<si32> getIdentifier(std::string scope, std::string type, std::string name, bool silent = false);
 	boost::optional<si32> getIdentifier(std::string type, const JsonNode & name, bool silent = false);
 	boost::optional<si32> getIdentifier(const JsonNode & name, bool silent = false);
+	boost::optional<si32> getIdentifier(std::string scope, std::string fullName, bool silent = false);
 
 	/// registers new object
 	void registerObject(std::string scope, std::string type, std::string name, si32 identifier);
@@ -295,7 +296,11 @@ public:
 
 	CModHandler();
 
-	std::string normalizeIdentifier(const std::string & scope, const std::string & remoteScope, const std::string & identifier) const;
+	static std::string normalizeIdentifier(const std::string & scope, const std::string & remoteScope, const std::string & identifier);
+
+	static void parseIdentifier(const std::string & fullIdentifier, std::string & scope, std::string & type, std::string & identifier);
+
+	static std::string makeFullIdentifier(const std::string & scope, const std::string & type, const std::string & identifier);
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{

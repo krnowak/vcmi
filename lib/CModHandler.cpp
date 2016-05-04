@@ -177,6 +177,20 @@ boost::optional<si32> CIdentifierStorage::getIdentifier(const JsonNode & name, b
 	return boost::optional<si32>();
 }
 
+boost::optional<si32> CIdentifierStorage::getIdentifier(std::string scope, std::string fullName, bool silent)
+{
+	auto pair  = splitString(fullName, ':'); // remoteScope:<type.name>
+	auto pair2 = splitString(pair.second,   '.'); // type.name
+	auto idList = getPossibleIdentifiers(ObjectCallback(scope, pair.first, pair2.first, pair2.second, std::function<void(si32)>(), silent));
+
+	if (idList.size() == 1)
+		return idList.front().id;
+	if (!silent)
+		logGlobal->errorStream() << "Failed to resolve identifier " << fullName << " of type " << pair2.first << " from mod " << scope;
+
+	return boost::optional<si32>();
+}
+
 void CIdentifierStorage::registerObject(std::string scope, std::string type, std::string name, si32 identifier)
 {
 	ObjectData data;
@@ -570,8 +584,10 @@ CModHandler::CModHandler()
 	}
 
 	for(int i=0; i<GameConstants::PRIMARY_SKILLS; ++i)
+	{
 		identifiers.registerObject("core", "primSkill", PrimarySkill::names[i], i);
-
+		identifiers.registerObject("core", "primarySkill", PrimarySkill::names[i], i);
+	}
 }
 
 void CModHandler::loadConfigFromFile (std::string name)
@@ -940,7 +956,7 @@ void CModHandler::afterLoad()
 	file << modSettings;
 }
 
-std::string CModHandler::normalizeIdentifier(const std::string & scope, const std::string & remoteScope, const std::string & identifier) const
+std::string CModHandler::normalizeIdentifier(const std::string & scope, const std::string & remoteScope, const std::string & identifier)
 {
 	auto p = splitString(identifier, ':');
 
@@ -951,4 +967,34 @@ std::string CModHandler::normalizeIdentifier(const std::string & scope, const st
 		p.first.clear();
 
 	return p.first.empty() ? p.second : p.first +":"+p.second;
+}
+
+void CModHandler::parseIdentifier(const std::string & fullIdentifier, std::string & scope, std::string & type, std::string & identifier)
+{
+	auto p = splitString(fullIdentifier, ':');
+
+	scope = p.first;
+
+	auto p2 = splitString(p.second, '.');
+
+	if(p2.first != "")
+	{
+		type = p2.first;
+		identifier = p2.second;
+	}
+	else
+	{
+		type = p.second;
+		identifier = "";
+	}
+}
+
+std::string CModHandler::makeFullIdentifier(const std::string & scope, const std::string & type, const std::string & identifier)
+{
+	auto p = splitString(identifier, ':');
+
+	if(p.first != "")
+		return p.first +":" + type + "." + p.second;//ignore type if identifier is scoped
+	else
+		return scope == "" ? (identifier == "" ? type : type + "." + identifier) : scope +":" + type + "." + identifier;
 }
