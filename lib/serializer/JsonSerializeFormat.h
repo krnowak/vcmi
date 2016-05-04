@@ -215,10 +215,10 @@ public:
 	};
 
 	///si32-convertible enum <-> Json string enum
-	template <typename T>
-	void serializeNumericEnum(const std::string & fieldName, T & value, const T defaultValue, const std::vector<std::string> & enumMap)
+	template <typename T, typename U>
+	void serializeNumericEnum(const std::string & fieldName, T & value, const U & defaultValue, const std::vector<std::string> & enumMap)
 	{
-		doSerializeInternal<T, T, si32>(fieldName, value, defaultValue, enumMap);
+		doSerializeInternal<T, U, si32>(fieldName, value, defaultValue, enumMap);
 	};
 
 	template <typename T, typename U, typename C>
