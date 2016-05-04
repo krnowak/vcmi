@@ -196,7 +196,6 @@ void MapComparer::compareOptions()
 	checkEqual(actual->allowedAbilities, expected->allowedAbilities);
 	checkEqual(actual->allowedArtifact, expected->allowedArtifact);
 	checkEqual(actual->allowedSpell, expected->allowedSpell);
-	//checkEqual(actual->allowedAbilities, expected->allowedAbilities);
 
 	//todo: compareOptions  events
 }
@@ -283,7 +282,6 @@ JsonMapComparer::JsonMapComparer():
 {
 
 }
-
 
 vstd::ScopeGuard<JsonMapComparer::TScopeGuard> JsonMapComparer::pushName(const std::string & name)
 {
