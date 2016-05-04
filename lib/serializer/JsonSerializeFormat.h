@@ -283,6 +283,37 @@ public:
 		}
 	}
 
+	///si32-convertible identifier set <-> Json array of string
+	template <typename T>
+	void serializeIdArray(const std::string & fieldName, std::set<T> & value, const TDecoder & decoder, const TEncoder & encoder)
+	{
+		std::vector<si32> temp;
+
+		if(saving)
+		{
+			temp.reserve(value.size());
+
+			for(const T & vitem : value)
+			{
+				si32 item = static_cast<si32>(vitem);
+				temp.push_back(item);
+			}
+		}
+
+		serializeInternal(fieldName, temp, decoder, encoder);
+		if(!saving)
+		{
+			value.clear();
+
+			for(const si32 item : temp)
+			{
+				T vitem = static_cast<T>(item);
+				value.insert(vitem);
+			}
+		}
+	}
+
+
 	///si32-convertible instance identifier <-> Json string
 	template <typename T>
 	void serializeInstance(const std::string & fieldName, T & value, const T & defaultValue)

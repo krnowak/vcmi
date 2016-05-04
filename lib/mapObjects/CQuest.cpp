@@ -833,12 +833,12 @@ void CGSeerHut::serializeJsonOptions(JsonSerializeFormat & handler)
 {
 	static const std::map<ERewardType, std::string> REWARD_MAP =
 	{
-        {NOTHING,		""},
-        {EXPERIENCE,	"experience"},
-        {MANA_POINTS,	"mana"},
-        {MORALE_BONUS,	"morale"},
-        {LUCK_BONUS,	"luck"},
-        {RESOURCES,		"resource"},
+		{NOTHING,		""},
+		{EXPERIENCE,	"experience"},
+		{MANA_POINTS,	"mana"},
+		{MORALE_BONUS,	"morale"},
+		{LUCK_BONUS,	"luck"},
+		{RESOURCES,		"resource"},
 		{PRIMARY_SKILL,	"primarySkill"},
 		{SECONDARY_SKILL,"secondarySkill"},
 		{ARTIFACT,		"artifact"},
@@ -848,11 +848,11 @@ void CGSeerHut::serializeJsonOptions(JsonSerializeFormat & handler)
 
 	static const std::map<std::string, ERewardType> REWARD_RMAP =
 	{
-        {"experience",    EXPERIENCE},
-        {"mana",          MANA_POINTS},
-        {"morale",        MORALE_BONUS},
-        {"luck",          LUCK_BONUS},
-        {"resource",      RESOURCES},
+		{"experience",    EXPERIENCE},
+		{"mana",          MANA_POINTS},
+		{"morale",        MORALE_BONUS},
+		{"luck",          LUCK_BONUS},
+		{"resource",      RESOURCES},
 		{"primarySkill",  PRIMARY_SKILL},
 		{"secondarySkill",SECONDARY_SKILL},
 		{"artifact",      ARTIFACT},

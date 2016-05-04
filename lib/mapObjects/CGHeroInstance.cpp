@@ -1647,15 +1647,7 @@ void CGHeroInstance::serializeJsonOptions(JsonSerializeFormat & handler)
 		}
 	}
 
-	//spellBook
-	if(handler.saving)
-	{
-
-	}
-	else
-	{
-
-	}
+	handler.serializeIdArray("spellBook", spells, &CSpellHandler::decodeSpell, &CSpellHandler::encodeSpell);
 }
 
 bool CGHeroInstance::isMissionCritical() const
