@@ -482,15 +482,17 @@ void CGEvent::serializeJsonOptions(JsonSerializeFormat & handler)
 
         if(handler.saving)
 		{
-            for(int p = 0; p < PlayerColor::PLAYER_LIMIT_I; p++)
+			if(availableFor != GameConstants::ALL_PLAYERS)
+			{
+	            for(int p = 0; p < PlayerColor::PLAYER_LIMIT_I; p++)
 				if(availableFor & (1 << p))
 					temp.push_back(p);
+				handler.serializeIdArray("availableFor", temp, decodePlayer, encodePlayer);
+			}
 		}
-
-        handler.serializeIdArray("availableFor", temp, decodePlayer, encodePlayer);
-
-        if(!handler.saving)
+        else
 		{
+			handler.serializeIdArray("availableFor", temp, decodePlayer, encodePlayer);
             if(temp.empty())
 				availableFor = GameConstants::ALL_PLAYERS;
 			else
