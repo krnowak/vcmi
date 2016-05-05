@@ -341,7 +341,7 @@ void CMapFormatJson::serializePlayerInfo(JsonSerializeFormat & handler)
 
 void CMapFormatJson::readTeams(JsonDeserializer & handler)
 {
-	auto teams = handler.enterStruct("teams");
+	auto teams = handler.enterArray("teams");
 	const JsonNode & src = teams.get();
 
     if(src.getType() != JsonNode::DATA_VECTOR)
@@ -384,14 +384,11 @@ void CMapFormatJson::readTeams(JsonDeserializer & handler)
 			if(player.canAnyonePlay() && player.team == TeamID::NO_TEAM)
 				player.team = TeamID(mapHeader->howManyTeams++);
 		}
-
 	}
 }
 
 void CMapFormatJson::writeTeams(JsonSerializer & handler)
 {
-	auto teams = handler.enterStruct("teams");
-	JsonNode & dest = teams.get();
 	std::vector<std::set<PlayerColor>> teamsData;
 
 	teamsData.resize(mapHeader->howManyTeams);
@@ -411,19 +408,25 @@ void CMapFormatJson::writeTeams(JsonSerializer & handler)
 		return elem.size() <= 1;
 	});
 
-	//construct output
-	dest.setType(JsonNode::DATA_VECTOR);
-
-	for(const std::set<PlayerColor> & teamData : teamsData)
+	if(!teamsData.empty())
 	{
-		JsonNode team(JsonNode::DATA_VECTOR);
-		for(const PlayerColor & player : teamData)
+		auto teams = handler.enterArray("teams");
+		JsonNode & dest = teams.get();
+
+		//construct output
+		dest.setType(JsonNode::DATA_VECTOR);
+
+		for(const std::set<PlayerColor> & teamData : teamsData)
 		{
-			JsonNode member(JsonNode::DATA_STRING);
-			member.String() = GameConstants::PLAYER_COLOR_NAMES[player.getNum()];
-			team.Vector().push_back(std::move(member));
+			JsonNode team(JsonNode::DATA_VECTOR);
+			for(const PlayerColor & player : teamData)
+			{
+				JsonNode member(JsonNode::DATA_STRING);
+				member.String() = GameConstants::PLAYER_COLOR_NAMES[player.getNum()];
+				team.Vector().push_back(std::move(member));
+			}
+			dest.Vector().push_back(std::move(team));
 		}
-		dest.Vector().push_back(std::move(team));
 	}
 }
 
