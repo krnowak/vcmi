@@ -465,6 +465,41 @@ void CGEvent::serializeJsonOptions(JsonSerializeFormat & handler)
 
     handler.serializeBool<bool>("aIActivable", computerActivate, true, false, false);
     handler.serializeBool<bool>("humanActivable", humanActivate, true, false, true);
+	handler.serializeBool<bool>("removeAfterVisit", removeAfterVisit, true, false, false);
 
+    {
+		auto decodePlayer = [](const std::string & id)->si32
+		{
+			return vstd::find_pos(GameConstants::PLAYER_COLOR_NAMES, id);
+		};
 
+		auto encodePlayer = [](si32 idx)->std::string
+		{
+			return GameConstants::PLAYER_COLOR_NAMES[idx];
+		};
+
+        std::vector<ui8> temp;
+
+        if(handler.saving)
+		{
+            for(int p = 0; p < PlayerColor::PLAYER_LIMIT_I; p++)
+				if(availableFor & (1 << p))
+					temp.push_back(p);
+		}
+
+        handler.serializeIdArray("availableFor", temp, decodePlayer, encodePlayer);
+
+        if(!handler.saving)
+		{
+            if(temp.empty())
+				availableFor = GameConstants::ALL_PLAYERS;
+			else
+			{
+				availableFor = 0;
+
+				for(auto p : temp)
+					availableFor |= (1 << p);
+			}
+		}
+    }
 }

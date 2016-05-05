@@ -807,7 +807,7 @@ CMapLoaderJson::MapObjectLoader::MapObjectLoader(CMapLoaderJson * _owner, JsonMa
 
 void CMapLoaderJson::MapObjectLoader::construct()
 {
-	logGlobal->debugStream() <<"Loading: " <<jsonKey;
+	//logGlobal->debugStream() <<"Loading: " <<jsonKey;
 
 	//TODO:consider move to ObjectTypeHandler
 	//find type handler

@@ -18,8 +18,8 @@
 JsonSerializeHelper::JsonSerializeHelper(JsonSerializeHelper && other):
 	owner(other.owner),
 	thisNode(other.thisNode),
-	restoreState(false),
-	parentNode(other.parentNode)
+	parentNode(other.parentNode),
+	restoreState(false)
 {
 	std::swap(restoreState, other.restoreState);
 }
@@ -43,8 +43,8 @@ JsonSerializeFormat * JsonSerializeHelper::operator->()
 JsonSerializeHelper::JsonSerializeHelper(JsonSerializeFormat & owner_, JsonNode * thisNode_):
 	owner(owner_),
 	thisNode(thisNode_),
-	restoreState(true),
-	parentNode(owner.current)
+	parentNode(owner.current),
+	restoreState(true)
 {
 	owner.current = thisNode;
 }
@@ -52,8 +52,8 @@ JsonSerializeHelper::JsonSerializeHelper(JsonSerializeFormat & owner_, JsonNode 
 JsonSerializeHelper::JsonSerializeHelper(JsonSerializeHelper & parent, const std::string & fieldName):
 	owner(parent.owner),
 	thisNode(&(parent.thisNode->operator[](fieldName))),
-	restoreState(true),
-	parentNode(parent.thisNode)
+	parentNode(parent.thisNode),
+	restoreState(true)
 {
 	owner.current = thisNode;
 }

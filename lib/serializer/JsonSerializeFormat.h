@@ -315,7 +315,6 @@ public:
 		}
 	}
 
-
 	///si32-convertible instance identifier <-> Json string
 	template <typename T>
 	void serializeInstance(const std::string & fieldName, T & value, const T & defaultValue)
