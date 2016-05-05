@@ -610,16 +610,6 @@ void CGCreature::serializeJsonOptions(JsonSerializeFormat & handler)
 			si32 amount = getStack(SlotID(0)).count;
 			handler.serializeNumeric("amount", amount, 0);
 		}
-
-		if(resources.nonZero())
-		{
-			for(size_t idx = 0; idx < (GameConstants::RESOURCE_QUANTITY - 1); idx++)
-			{
-				auto amount = resources[idx];
-				if(amount > 0)
-					handler.getCurrent()["rewardResources"][GameConstants::RESOURCE_NAMES[idx]].Float() = amount;
-			}
-		}
 	}
 	else
 	{
@@ -629,11 +619,10 @@ void CGCreature::serializeJsonOptions(JsonSerializeFormat & handler)
 		hlp->count = amount;
 		//type will be set during initialization
 		putStack(SlotID(0), hlp);
-		{
-			TResources tmp(handler.getCurrent()["rewardResources"]);
-			std::swap(tmp,resources);
-		}
 	}
+
+	resources.serializeJson(handler, "rewardResources");
+
 	handler.serializeId("rewardArtifact", gainedArtifact, ArtifactID(ArtifactID::NONE), &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
 	handler.serializeBool("noGrowing", notGrowingTeam);
 	handler.serializeBool("neverFlees", neverFlees);

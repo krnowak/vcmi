@@ -2463,15 +2463,7 @@
 		"y" : 18,
 		"options" : {
 			"aIActivable" : true,
-			"creatures" : [
-			],
 			"guardMessage" : "test",
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"removeAfterVisit" : true
 		}
 	},
@@ -2499,8 +2491,6 @@
 				"tan",
 				"orange"
 			],
-			"creatures" : [
-			],
 			"guards" : [
 				{
 					"amount" : 1,
@@ -2519,12 +2509,6 @@
 				{},
 				{}
 			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"removeAfterVisit" : true
 		}
 	},
@@ -2608,8 +2592,6 @@
 				"red",
 				"pink"
 			],
-			"creatures" : [
-			],
 			"guardMessage" : "messagenondefault",
 			"guards" : [
 				{
@@ -2641,13 +2623,7 @@
 					"type" : "pikeman"
 				}
 			],
-			"mana" : -777,
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			}
+			"mana" : -777
 		}
 	},
 	"hero_101" : {
@@ -2916,14 +2892,6 @@
 		"x" : 78,
 		"y" : 18,
 		"options" : {
-			"creatures" : [
-			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"removeAfterVisit" : true
 		}
 	},
@@ -3012,14 +2980,6 @@
 				"inexhaustibleCartOfLumber",
 				"inexhaustibleCartOfOre"
 			],
-			"creatures" : [
-			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"removeAfterVisit" : true
 		}
 	},
@@ -3042,14 +3002,6 @@
 		"x" : 86,
 		"y" : 18,
 		"options" : {
-			"creatures" : [
-			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"removeAfterVisit" : true,
 			"spells" : [
 				"airElemental",
@@ -3173,12 +3125,6 @@
 					"type" : "pikeman"
 				}
 			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"removeAfterVisit" : true
 		}
 	},
@@ -3231,12 +3177,6 @@
 					"type" : "troll"
 				}
 			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"removeAfterVisit" : true
 		}
 	},
@@ -4814,17 +4754,7 @@
 		},
 		"type" : "pandoraBox",
 		"x" : 4,
-		"y" : 66,
-		"options" : {
-			"creatures" : [
-			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			}
-		}
+		"y" : 66
 	},
 	"sign_179" : {
 		"l" : 0,
@@ -4889,8 +4819,6 @@
 		"x" : 4,
 		"y" : 68,
 		"options" : {
-			"creatures" : [
-			],
 			"guardMessage" : "giveexp",
 			"guards" : [
 				{},
@@ -4904,13 +4832,7 @@
 				{},
 				{}
 			],
-			"mana" : -555,
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			}
+			"mana" : -555
 		}
 	},
 	"sign_182" : {
@@ -4954,8 +4876,6 @@
 		"x" : 4,
 		"y" : 70,
 		"options" : {
-			"creatures" : [
-			],
 			"experience" : 1000,
 			"luck" : 2,
 			"mana" : 100,
@@ -5018,14 +4938,6 @@
 		"x" : 4,
 		"y" : 72,
 		"options" : {
-			"creatures" : [
-			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"secondarySkills" : {
 				"pathfinding" : "expert",
 				"wisdom" : "advanced",
@@ -5090,12 +5002,6 @@
 					"type" : "rogue"
 				}
 			],
-			"primarySkills" : {
-				"attack" : 0,
-				"defence" : 0,
-				"knowledge" : 0,
-				"spellpower" : 0
-			},
 			"spells" : [
 				"armageddon",
 				"waterElemental"

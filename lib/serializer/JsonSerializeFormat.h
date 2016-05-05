@@ -43,18 +43,20 @@ protected:
 	JsonSerializeFormat & owner;
 
 	JsonNode * thisNode;
+	JsonNode * parentNode;
+
 	friend class JsonStructSerializer;
 
 private:
 	bool restoreState;
-	JsonNode * parentNode;
 };
 
 class JsonStructSerializer: public JsonSerializeHelper
 {
 public:
+	bool optional;
 	JsonStructSerializer(JsonStructSerializer && other);
-
+	~JsonStructSerializer();
 protected:
 	JsonStructSerializer(JsonSerializeFormat & owner_, JsonNode * thisNode_);
 	JsonStructSerializer(JsonSerializeFormat & owner_, const std::string & fieldName);

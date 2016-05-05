@@ -2147,7 +2147,6 @@ void CMapLoaderH3M::readMessageAndGuards(std::string& message, CCreatureSet* gua
 	}
 }
 
-
 void CMapLoaderH3M::readSpells(std::set<SpellID>& dest)
 {
 	readBitmask(dest,9,GameConstants::SPELLS_QUANTITY,false);
@@ -2162,8 +2161,8 @@ void CMapLoaderH3M::readResourses(TResources& resources)
 	}
 }
 
-template <class Indenifier>
-void CMapLoaderH3M::readBitmask(std::set<Indenifier>& dest, const int byteCount, const int limit, bool negate)
+template <class Indentifier>
+void CMapLoaderH3M::readBitmask(std::set<Indentifier>& dest, const int byteCount, const int limit, bool negate)
 {
 	std::vector<bool> temp;
 	temp.resize(limit,true);
@@ -2173,17 +2172,10 @@ void CMapLoaderH3M::readBitmask(std::set<Indenifier>& dest, const int byteCount,
 	{
 		if(temp[i])
 		{
-			dest.insert(static_cast<Indenifier>(i));
+			dest.insert(static_cast<Indentifier>(i));
 		}
-//		else
-//		{
-//			dest.erase(static_cast<Indenifier>(i));
-//		}
 	}
-
 }
-
-
 
 void CMapLoaderH3M::readBitmask(std::vector<bool>& dest, const int byteCount, const int limit, bool negate)
 {

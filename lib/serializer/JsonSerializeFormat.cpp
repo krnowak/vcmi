@@ -63,37 +63,50 @@ JsonStructSerializer JsonSerializeHelper::enterStruct(const std::string & fieldN
 	return JsonStructSerializer(*this, fieldName);
 }
 
-JsonArraySerializer JsonSerializeHelper::enterArray(const std::string& fieldName)
+JsonArraySerializer JsonSerializeHelper::enterArray(const std::string & fieldName)
 {
 	return JsonArraySerializer(*this, fieldName);
 }
 
 //JsonStructSerializer
 JsonStructSerializer::JsonStructSerializer(JsonStructSerializer && other):
-	JsonSerializeHelper(std::move(static_cast<JsonSerializeHelper &>(other)))
+	JsonSerializeHelper(std::move(static_cast<JsonSerializeHelper &>(other))),
+	optional(other.optional)
 {
 
 }
 
 JsonStructSerializer::JsonStructSerializer(JsonSerializeFormat & owner_, const std::string & fieldName):
-	JsonSerializeHelper(owner_, &(owner_.current->operator[](fieldName)))
+	JsonSerializeHelper(owner_, &(owner_.current->operator[](fieldName))),
+	optional(false)
 {
 	if(owner.saving)
 		thisNode->setType(JsonNode::DATA_STRUCT);
 }
 
 JsonStructSerializer::JsonStructSerializer(JsonSerializeHelper & parent, const std::string & fieldName):
-	JsonSerializeHelper(parent, fieldName)
+	JsonSerializeHelper(parent, fieldName),
+	optional(false)
 {
 	if(owner.saving)
 		thisNode->setType(JsonNode::DATA_STRUCT);
 }
 
 JsonStructSerializer::JsonStructSerializer(JsonSerializeFormat & owner_, JsonNode * thisNode_):
-	JsonSerializeHelper(owner_, thisNode_)
+	JsonSerializeHelper(owner_, thisNode_),
+	optional(false)
 {
 	if(owner.saving)
 		thisNode->setType(JsonNode::DATA_STRUCT);
+}
+
+JsonStructSerializer::~JsonStructSerializer()
+{
+	//todo: delete empty optional node
+	if(owner.saving && optional && thisNode->Struct().empty())
+	{
+		//
+	}
 }
 
 //JsonArraySerializer
