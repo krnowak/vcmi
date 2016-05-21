@@ -112,7 +112,6 @@ namespace TriggeredEventsDetail
 		"have_0", "haveBuilding_0", "destroy_0"
 	};
 
-
 	static const std::array<std::string, 2> typeNames = { "victory", "defeat" };
 
 	static EventCondition JsonToCondition(const JsonNode & node)
@@ -160,11 +159,11 @@ namespace TriggeredEventsDetail
 		return event;
 	}
 
-	static JsonNode ConditionToJson(const EventCondition& event)
+	static JsonNode ConditionToJson(const EventCondition & event)
 	{
 		JsonNode json;
 
-		JsonVector& asVector = json.Vector();
+		JsonVector & asVector = json.Vector();
 
 		JsonNode condition;
 		condition.String() = conditionNames.at(event.condition);
@@ -180,7 +179,7 @@ namespace TriggeredEventsDetail
 		if(event.value != -1)
 			data["value"].Float() = event.value;
 
-		if(event.position != int3(-1,-1,-1))
+		if(event.position != int3(-1, -1, -1))
 		{
 			auto & position = data["position"].Vector();
 			position.resize(3);
@@ -323,8 +322,17 @@ void CMapFormatJson::serializePlayerInfo(JsonSerializeFormat & handler)
 		//mainCustomHeroName
 
 		//heroes
+		if(handler.saving)
 		{
-			//auto heroes = playerData.enterStruct("heroes");
+			if(!info.heroesNames.empty())
+			{
+				auto heroes = playerData.enterStruct("heroes");
+			}
+		}
+		else
+		{
+			auto heroes = playerData.enterStruct("heroes");
+
 
 		}
 
@@ -352,12 +360,8 @@ void CMapFormatJson::readTeams(JsonDeserializer & handler)
 
 		mapHeader->howManyTeams = 0;
 		for(int i = 0; i < PlayerColor::PLAYER_LIMIT_I; i++)
-		{
 			if(mapHeader->players[i].canComputerPlay || mapHeader->players[i].canHumanPlay)
-			{
 				mapHeader->players[i].team = TeamID(mapHeader->howManyTeams++);
-			}
-		}
 	}
 	else
 	{
@@ -365,25 +369,17 @@ void CMapFormatJson::readTeams(JsonDeserializer & handler)
 		mapHeader->howManyTeams = srcVector.size();
 
 		for(int team = 0; team < mapHeader->howManyTeams; team++)
-		{
 			for(const JsonNode & playerData : srcVector[team].Vector())
 			{
 				PlayerColor player = PlayerColor(vstd::find_pos(GameConstants::PLAYER_COLOR_NAMES, playerData.String()));
 				if(player.isValidPlayer())
-				{
 					if(mapHeader->players[player.getNum()].canAnyonePlay())
-					{
 						mapHeader->players[player.getNum()].team = TeamID(team);
-					}
-				}
 			}
-		}
 
 		for(PlayerInfo & player : mapHeader->players)
-		{
 			if(player.canAnyonePlay() && player.team == TeamID::NO_TEAM)
 				player.team = TeamID(mapHeader->howManyTeams++);
-		}
 	}
 }
 
@@ -447,7 +443,7 @@ void CMapFormatJson::readTriggeredEvents(JsonDeserializer & handler)
 
 	mapHeader->triggeredEvents.clear();
 
-	for (auto & entry : input["triggeredEvents"].Struct())
+	for(auto & entry : input["triggeredEvents"].Struct())
 	{
 		TriggeredEvent event;
 		event.identifier = entry.first;
@@ -479,7 +475,7 @@ void CMapFormatJson::writeTriggeredEvents(JsonSerializer & handler)
 		writeTriggeredEvent(event, triggeredEvents[event.identifier]);
 }
 
-void CMapFormatJson::writeTriggeredEvent(const TriggeredEvent& event, JsonNode& dest)
+void CMapFormatJson::writeTriggeredEvent(const TriggeredEvent & event, JsonNode & dest)
 {
 	using namespace TriggeredEventsDetail;
 
@@ -494,11 +490,11 @@ void CMapFormatJson::writeTriggeredEvent(const TriggeredEvent& event, JsonNode& 
 
 void CMapFormatJson::serializeOptions(JsonSerializeFormat & handler)
 {
-	//rumors
+	//todo:rumors
 
-	//disposedHeroes
+	//todo:disposedHeroes
 
-	//predefinedHeroes
+	//todo:predefinedHeroes
 
 	handler.serializeLIC("allowedAbilities", &CHeroHandler::decodeSkill, &CHeroHandler::encodeSkill, VLC->heroh->getDefaultAllowedAbilities(), map->allowedAbilities);
 
@@ -506,7 +502,7 @@ void CMapFormatJson::serializeOptions(JsonSerializeFormat & handler)
 
 	handler.serializeLIC("allowedSpells", &CSpellHandler::decodeSpell, &CSpellHandler::encodeSpell, VLC->spellh->getDefaultAllowed(), map->allowedSpell);
 
-	//events
+	//todo:events
 }
 
 void CMapFormatJson::readOptions(JsonDeserializer & handler)
@@ -518,7 +514,6 @@ void CMapFormatJson::writeOptions(JsonSerializer & handler)
 {
 	serializeOptions(handler);
 }
-
 
 ///CMapPatcher
 CMapPatcher::CMapPatcher(JsonNode stream):
@@ -544,7 +539,6 @@ void CMapPatcher::readPatchData()
 	readTriggeredEvents(handler);
 }
 
-
 ///CMapLoaderJson
 CMapLoaderJson::CMapLoaderJson(CInputStream * stream):
 	CMapFormatJson(),
@@ -555,7 +549,7 @@ CMapLoaderJson::CMapLoaderJson(CInputStream * stream):
 
 }
 
-si32 CMapLoaderJson::getIdentifier(const std::string& type, const std::string& name)
+si32 CMapLoaderJson::getIdentifier(const std::string & type, const std::string & name)
 {
 	boost::optional<si32> res = VLC->modh->identifiers.getIdentifier("core", type, name, false);
 
@@ -662,12 +656,11 @@ void CMapLoaderJson::readHeader(const bool complete)
 		readOptions(handler);
 }
 
-
-void CMapLoaderJson::readTerrainTile(const std::string& src, TerrainTile& tile)
+void CMapLoaderJson::readTerrainTile(const std::string & src, TerrainTile & tile)
 {
 	using namespace TerrainDetail;
 	{//terrain type
-		const std::string typeCode = src.substr(0,2);
+		const std::string typeCode = src.substr(0, 2);
 
 		int rawType = vstd::find_pos(terrainCodes, typeCode);
 
@@ -684,7 +677,7 @@ void CMapLoaderJson::readTerrainTile(const std::string& src, TerrainTile& tile)
 		int len = pos - startPos;
 		if(len<=0)
 			throw new std::runtime_error("Invalid terrain view in "+src);
-		const std::string rawCode = src.substr(startPos,len);
+		const std::string rawCode = src.substr(startPos, len);
 		tile.terView = atoi(rawCode.c_str());
 		startPos+=len;
 	}
@@ -699,7 +692,7 @@ void CMapLoaderJson::readTerrainTile(const std::string& src, TerrainTile& tile)
 		return;
 	bool hasRoad = true;
 	{//road type
-		const std::string typeCode = src.substr(startPos,2);
+		const std::string typeCode = src.substr(startPos, 2);
 		startPos+=2;
 		int rawType = vstd::find_pos(roadCodes, typeCode);
 		if(rawType < 0)
@@ -724,7 +717,7 @@ void CMapLoaderJson::readTerrainTile(const std::string& src, TerrainTile& tile)
 		int len = pos - startPos;
 		if(len<=0)
 			throw new std::runtime_error("Invalid road dir in "+src);
-		const std::string rawCode = src.substr(startPos,len);
+		const std::string rawCode = src.substr(startPos, len);
 		tile.roadDir = atoi(rawCode.c_str());
 		startPos+=len;
 	}
@@ -740,7 +733,7 @@ void CMapLoaderJson::readTerrainTile(const std::string& src, TerrainTile& tile)
 		return;
 	if(hasRoad)
 	{//river type
-		const std::string typeCode = src.substr(startPos,2);
+		const std::string typeCode = src.substr(startPos, 2);
 		startPos+=2;
 		int rawType = vstd::find_pos(riverCodes, typeCode);
 		if(rawType < 0)
@@ -754,7 +747,7 @@ void CMapLoaderJson::readTerrainTile(const std::string& src, TerrainTile& tile)
 		int len = pos - startPos;
 		if(len<=0)
 			throw new std::runtime_error("Invalid river dir in "+src);
-		const std::string rawCode = src.substr(startPos,len);
+		const std::string rawCode = src.substr(startPos, len);
 		tile.riverDir = atoi(rawCode.c_str());
 		startPos+=len;
 	}
@@ -767,9 +760,9 @@ void CMapLoaderJson::readTerrainTile(const std::string& src, TerrainTile& tile)
 	}
 }
 
-void CMapLoaderJson::readTerrainLevel(const JsonNode& src, const int index)
+void CMapLoaderJson::readTerrainLevel(const JsonNode & src, const int index)
 {
-	int3 pos(0,0,index);
+	int3 pos(0, 0, index);
 
 	const JsonVector & rows = src.Vector();
 
@@ -802,8 +795,8 @@ void CMapLoaderJson::readTerrain()
 
 }
 
-CMapLoaderJson::MapObjectLoader::MapObjectLoader(CMapLoaderJson * _owner, JsonMap::value_type& json):
-	owner(_owner), instance(nullptr),id(-1), jsonKey(json.first), configuration(json.second)
+CMapLoaderJson::MapObjectLoader::MapObjectLoader(CMapLoaderJson * _owner, JsonMap::value_type & json):
+	owner(_owner), instance(nullptr), id(-1), jsonKey(json.first), configuration(json.second)
 {
 
 }
@@ -943,7 +936,7 @@ CMapSaverJson::~CMapSaverJson()
 
 }
 
-void CMapSaverJson::addToArchive(const JsonNode& data, const std::string& filename)
+void CMapSaverJson::addToArchive(const JsonNode & data, const std::string & filename)
 {
 	std::ostringstream out;
 	out << data;
@@ -1010,14 +1003,10 @@ const std::string CMapSaverJson::writeTerrainTile(const TerrainTile & tile)
 	out << terrainCodes.at(int(tile.terType)) << (int)tile.terView << flipCodes[tile.extTileFlags % 4];
 
 	if(tile.roadType != ERoadType::NO_ROAD)
-	{
 		out << roadCodes.at(int(tile.roadType)) << (int)tile.roadDir << flipCodes[(tile.extTileFlags >> 4) % 4];
-	}
 
 	if(tile.riverType != ERiverType::NO_RIVER)
-	{
 		out << riverCodes.at(int(tile.riverType)) << (int)tile.riverDir << flipCodes[(tile.extTileFlags >> 2) % 4];
-	}
 
 	return out.str();
 }

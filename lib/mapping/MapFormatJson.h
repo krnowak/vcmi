@@ -53,7 +53,6 @@ protected:
 	 */
 	CMapHeader * mapHeader;
 
-
 	CMapFormatJson();
 
 	void serializeAllowedFactions(JsonSerializeFormat & handler, std::set<TFaction> & value);
@@ -73,7 +72,6 @@ protected:
 	 * Saves team settings to header
 	 */
 	void writeTeams(JsonSerializer & handler);
-
 
 	///common part triggered events of saving/loading
 	void serializeTriggeredEvents(JsonSerializeFormat & handler);
@@ -97,8 +95,6 @@ protected:
 	 * Writes one of triggered events
 	 */
 	void writeTriggeredEvent(const TriggeredEvent & event, JsonNode & dest);
-
-
 
 	///common part of map attributes saving/loading
 	void serializeOptions(JsonSerializeFormat & handler);
@@ -136,7 +132,6 @@ private:
 	 * Reads subset of header that can be replaced by patching.
 	 */
 	void readPatchData();
-
 
 	JsonNode input;
 };
@@ -181,7 +176,6 @@ private:
 
 		///configures object
 		void configure();
-
 	};
 
 	si32 getIdentifier(const std::string & type, const std::string & name);
