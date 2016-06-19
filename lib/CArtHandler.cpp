@@ -1393,7 +1393,7 @@ void CArtifactSet::artDeserializationFix(CBonusSystemNode *node)
 void CArtifactSet::serializeJsonArtifacts(JsonSerializeFormat & handler, const std::string & fieldName, CMap * map)
 {
 	//todo: creature and commander artifacts
-    if(handler.saving && artifactsInBackpack.empty() && artifactsWorn.empty())
+	if(handler.saving && artifactsInBackpack.empty() && artifactsWorn.empty())
 		return;
 
 	if(!handler.saving)
@@ -1434,7 +1434,7 @@ void CArtifactSet::serializeJsonHero(JsonSerializeFormat & handler, CMap * map)
 	if(handler.saving)
 	{
 		backpackTemp.reserve(artifactsInBackpack.size());
-        for(const ArtSlotInfo & info : artifactsInBackpack)
+		for(const ArtSlotInfo & info : artifactsInBackpack)
 			backpackTemp.push_back(info.artifact->artType->id);
 	}
 	handler.serializeIdArray(NArtifactPosition::backpack, backpackTemp, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
@@ -1471,8 +1471,7 @@ void CArtifactSet::serializeJsonSlot(JsonSerializeFormat & handler, const Artifa
 		if(info != nullptr && !info->locked)
 		{
 			artifactID = info->artifact->artType->id;
-
-            handler.serializeId(NArtifactPosition::namesHero[slot.num], artifactID, ArtifactID::NONE, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
+			handler.serializeId(NArtifactPosition::namesHero[slot.num], artifactID, ArtifactID::NONE, &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
 		}
 	}
 	else

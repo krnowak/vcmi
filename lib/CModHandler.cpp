@@ -966,7 +966,7 @@ std::string CModHandler::normalizeIdentifier(const std::string & scope, const st
 	if(p.first == remoteScope)
 		p.first.clear();
 
-	return p.first.empty() ? p.second : p.first +":"+p.second;
+	return p.first.empty() ? p.second : p.first + ":" + p.second;
 }
 
 void CModHandler::parseIdentifier(const std::string & fullIdentifier, std::string & scope, std::string & type, std::string & identifier)
@@ -994,7 +994,7 @@ std::string CModHandler::makeFullIdentifier(const std::string & scope, const std
 	auto p = splitString(identifier, ':');
 
 	if(p.first != "")
-		return p.first +":" + type + "." + p.second;//ignore type if identifier is scoped
+		return p.first + ":" + type + "." + p.second;//ignore type if identifier is scoped
 	else
-		return scope == "" ? (identifier == "" ? type : type + "." + identifier) : scope +":" + type + "." + identifier;
+		return scope == "" ? (identifier == "" ? type : type + "." + identifier) : scope + ":" + type + "." + identifier;
 }

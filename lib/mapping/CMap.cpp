@@ -564,7 +564,7 @@ void CMap::addQuest(CGObjectInstance * quest)
 
 void CMap::addNewObject(CGObjectInstance * obj)
 {
-    if(obj->id != ObjectInstanceID(objects.size()))
+	if(obj->id != ObjectInstanceID(objects.size()))
 		throw std::runtime_error("Invalid object instance id");
 
 	if(obj->instanceName == "")
@@ -574,18 +574,18 @@ void CMap::addNewObject(CGObjectInstance * obj)
 	if(it != instanceNames.end())
 		throw std::runtime_error("Object instance name duplicated: "+obj->instanceName);
 
-    objects.push_back(obj);
-    instanceNames[obj->instanceName] = obj;
-    addBlockVisTiles(obj);
+	objects.push_back(obj);
+	instanceNames[obj->instanceName] = obj;
+	addBlockVisTiles(obj);
 
-    //todo: make this virtual method of CGObjectInstance
-    switch (obj->ID)
-    {
-    case Obj::TOWN:
-    	towns.push_back(static_cast<CGTownInstance *>(obj));
-    	break;
-    case Obj::HERO:
-    	heroesOnMap.push_back(static_cast<CGHeroInstance*>(obj));
+	//todo: make this virtual method of CGObjectInstance
+	switch (obj->ID)
+	{
+	case Obj::TOWN:
+		towns.push_back(static_cast<CGTownInstance *>(obj));
+		break;
+	case Obj::HERO:
+		heroesOnMap.push_back(static_cast<CGHeroInstance*>(obj));
 		break;
 	case Obj::SEER_HUT:
 	case Obj::QUEST_GUARD:
@@ -593,9 +593,9 @@ void CMap::addNewObject(CGObjectInstance * obj)
 	case Obj::BORDER_GATE:
 		addQuest(obj);
 		break;
-    default:
-    	break;
-    }
+	default:
+		break;
+	}
 }
 
 void CMap::initTerrain()

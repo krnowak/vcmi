@@ -393,28 +393,24 @@ void CGDwelling::blockingDialogAnswered(const CGHeroInstance *hero, ui32 answer)
 
 void CGDwelling::serializeJsonOptions(JsonSerializeFormat & handler)
 {
-	//todo: CGDwelling::serializeJsonOptions
-
 	if(!handler.saving)
 		initRandomObjectInfo();
 
-    switch (ID)
-    {
-    case Obj::WAR_MACHINE_FACTORY:
+	switch (ID)
+	{
+	case Obj::WAR_MACHINE_FACTORY:
 	case Obj::REFUGEE_CAMP:
 		//do nothing
-    	break;
+		break;
 	case Obj::RANDOM_DWELLING:
 	case Obj::RANDOM_DWELLING_LVL:
 	case Obj::RANDOM_DWELLING_FACTION:
-		{
-			info->serializeJson(handler);
-		}
-    	//fall through
-    default:
+		info->serializeJson(handler);
+		//fall through
+	default:
 		serializeJsonOwner(handler);
-    	break;
-    }
+		break;
+	}
 }
 
 int CGTownInstance::getSightRadius() const //returns sight distance
@@ -464,7 +460,6 @@ CGTownInstance::EFortLevel CGTownInstance::fortLevel() const //0 - none, 1 - for
 
 int CGTownInstance::hallLevel() const // -1 - none, 0 - village, 1 - town, 2 - city, 3 - capitol
 {
-
 	if (hasBuilt(BuildingID::CAPITOL))
 		return 3;
 	if (hasBuilt(BuildingID::CITY_HALL))

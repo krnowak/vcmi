@@ -769,8 +769,8 @@ void CStackInstance::serializeJson(JsonSerializeFormat & handler)
 
 			boost::logic::tribool upgraded = (idRand % 2) > 0;
 
-            handler.serializeNumeric("level", level, 0);
-            handler.serializeBool("upgraded", upgraded);
+			handler.serializeNumeric("level", level, 0);
+			handler.serializeBool("upgraded", upgraded);
 		}
 	}
 	else
@@ -779,13 +779,12 @@ void CStackInstance::serializeJson(JsonSerializeFormat & handler)
 		if(type == nullptr)
 		{
 			int level = 0;
-
 			bool upgraded = false;
 
-            handler.serializeNumeric("level", level, 0);
-            handler.serializeBool("upgraded", upgraded);
+			handler.serializeNumeric("level", level, 0);
+			handler.serializeBool("upgraded", upgraded);
 
-            idRand = level * 2 + (int)(bool)upgraded;
+			idRand = level * 2 + (int)(bool)upgraded;
 		}
 	}
 }
