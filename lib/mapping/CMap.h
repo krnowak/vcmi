@@ -355,9 +355,6 @@ public:
 	std::map<std::string, ConstTransitivePtr<CGObjectInstance> > instanceNames;
 
 private:
-
-	void addQuest(CGObjectInstance * quest);
-
 	/// a 3-dimensional array of terrain tiles, access is as follows: x, y, level. where level=1 is underground
 	TerrainTile*** terrain;
 

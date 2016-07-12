@@ -553,15 +553,6 @@ void CMap::eraseArtifactInstance(CArtifactInstance * art)
 	artInstances[art->id.getNum()].dellNull();
 }
 
-void CMap::addQuest(CGObjectInstance * quest)
-{
-	auto q = dynamic_cast<IQuestObject *>(quest);
-	if(q == nullptr)
-		throw std::runtime_error("Invalid quest instance");
-	q->quest->qid = quests.size();
-	quests.push_back(q->quest);
-}
-
 void CMap::addNewObject(CGObjectInstance * obj)
 {
 	if(obj->id != ObjectInstanceID(objects.size()))
@@ -591,7 +582,11 @@ void CMap::addNewObject(CGObjectInstance * obj)
 	case Obj::QUEST_GUARD:
 	case Obj::BORDERGUARD:
 	case Obj::BORDER_GATE:
-		addQuest(obj);
+		{
+			auto q = dynamic_cast<IQuestObject *>(obj);
+			q->quest->qid = quests.size();
+			quests.push_back(q->quest);
+		}
 		break;
 	default:
 		break;

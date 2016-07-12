@@ -624,6 +624,7 @@ void CGCreature::serializeJsonOptions(JsonSerializeFormat & handler)
 	resources.serializeJson(handler, "rewardResources");
 
 	handler.serializeId("rewardArtifact", gainedArtifact, ArtifactID(ArtifactID::NONE), &CArtHandler::decodeArfifact, &CArtHandler::encodeArtifact);
+
 	handler.serializeBool("noGrowing", notGrowingTeam);
 	handler.serializeBool("neverFlees", neverFlees);
 	handler.serializeString("rewardMessage", message);
