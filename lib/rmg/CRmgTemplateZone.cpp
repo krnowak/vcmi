@@ -354,12 +354,17 @@ float3 CRmgTemplateZone::getCenter() const
 void CRmgTemplateZone::setCenter(const float3 &f)
 {
 	//limit boundaries to (0,1) square
-	//center = float3 (std::min(std::max(f.x, 0.f), 1.f), std::min(std::max(f.y, 0.f), 1.f), f.z);
 
 	//alternate solution - wrap zone around unitary square. If it doesn't fit on one side, will come out on the opposite side
 	center = f;
+
 	center.x = std::fmod(center.x, 1);
 	center.y = std::fmod(center.y, 1);
+
+	if (center.x < 0) //fmod seems to work only for positive numbers? we want to stay positive
+		center.x = 1 - std::abs(center.x);
+	if (center.y < 0)
+		center.y = 1 - std::abs(center.y);
 }
 
 
@@ -1546,6 +1551,31 @@ bool CRmgTemplateZone::placeMines (CMapGenerator* gen)
 	return true;
 }
 
+EObjectPlacingResult::EObjectPlacingResult CRmgTemplateZone::tryToPlaceObjectAndConnectToPath(CMapGenerator* gen, CGObjectInstance *obj, int3 &pos)
+{
+	//check if we can find a path around this object. Tiles will be set to "USED" after object is successfully placed.
+	obj->pos = pos;
+	gen->setOccupied(obj->visitablePos(), ETileType::BLOCKED);
+	for (auto tile : obj->getBlockedPos())
+	{
+		if (gen->map->isInTheMap(tile))
+			gen->setOccupied(tile, ETileType::BLOCKED);
+	}
+	int3 accessibleOffset = getAccessibleOffset(gen, obj->appearance, pos);
+	if (!accessibleOffset.valid())
+	{
+		logGlobal->warnStream() << boost::format("Cannot access required object at position %s, retrying") % pos;
+		return EObjectPlacingResult::CANNOT_FIT;
+	}
+	if (!connectPath(gen, accessibleOffset, true))
+	{
+		logGlobal->traceStream() << boost::format("Failed to create path to required object at position %s, retrying") % pos;
+		return EObjectPlacingResult::SEALED_OFF;
+	}
+	else
+		return EObjectPlacingResult::SUCCESS;
+}
+
 bool CRmgTemplateZone::createRequiredObjects(CMapGenerator* gen)
 {
 	logGlobal->traceStream() << "Creating required objects";
@@ -1554,7 +1584,6 @@ bool CRmgTemplateZone::createRequiredObjects(CMapGenerator* gen)
 	{
 		auto obj = object.first;
 		int3 pos;
-		int3 accessibleOffset;
 		while (true)
 		{
 			if (!findPlaceForObject(gen, obj, 3, pos))
@@ -1562,80 +1591,77 @@ bool CRmgTemplateZone::createRequiredObjects(CMapGenerator* gen)
 				logGlobal->errorStream() << boost::format("Failed to fill zone %d due to lack of space") % id;
 				return false;
 			}
-
-			//check if we can find a path around this object. Tiles will be set to "USED" after object is successfully placed.
-			obj->pos = pos;
-			gen->setOccupied (obj->visitablePos(), ETileType::BLOCKED);
-			for (auto tile : obj->getBlockedPos())
+			if (tryToPlaceObjectAndConnectToPath(gen, obj, pos) == EObjectPlacingResult::SUCCESS)
 			{
-				if (gen->map->isInTheMap(tile))
-					gen->setOccupied(tile, ETileType::BLOCKED);
-			}
-			accessibleOffset = getAccessibleOffset(gen, obj->appearance, pos);
-			if (!accessibleOffset.valid())
-			{
-				logGlobal->warnStream() << boost::format("Cannot access required object at position %s, retrying") % pos;
-				continue;
-			}
-			if (!connectPath(gen, accessibleOffset, true))
-			{
-				logGlobal->warnStream() << boost::format("Failed to create path to required object at position %s, retrying") % pos;
-				continue;
-			}
-			else
+				//paths to required objects constitute main paths of zone. otherwise they just may lead to middle and create dead zones
+				placeObject(gen, obj, pos);
+				guardObject(gen, obj, object.second, (obj->ID == Obj::MONOLITH_TWO_WAY), true);
 				break;
+			}
 		}
-
-
-		placeObject(gen, obj, pos);
-		guardObject (gen, obj, object.second, (obj->ID == Obj::MONOLITH_TWO_WAY), true);
-		//paths to required objects constitute main paths of zone. otherwise they just may lead to middle and create dead zones
 	}
 
 	for (const auto &obj : closeObjects)
 	{
-		std::vector<int3> tiles(possibleTiles.begin(), possibleTiles.end()); //new tiles vector after each object has been placed
-
-		// smallest distance to zone center, greatest distance to nearest object
-		auto isCloser = [this, gen](const int3 & lhs, const int3 & rhs) -> bool
-		{
-			float lDist = this->pos.dist2d(lhs);
-			float rDist = this->pos.dist2d(rhs);
-			lDist *= (lDist > 12) ? 10 : 1; //objects within 12 tile radius are preferred (smaller distance rating)
-			rDist *= (rDist > 12) ? 10 : 1;
-
-			return (lDist * 0.5f - std::sqrt(gen->getNearestObjectDistance(lhs))) < (rDist * 0.5f - std::sqrt(gen->getNearestObjectDistance(rhs)));
-		};
-
-		boost::sort (tiles, isCloser);
-
 		setTemplateForObject(gen, obj.first);
 		auto tilesBlockedByObject = obj.first->getBlockedOffsets();
-		bool result = false;
 
-		for (auto tile : tiles)
+		bool finished = false;
+		while (!finished)
 		{
-			//object must be accessible from at least one surounding tile
-			if (!isAccessibleFromAnywhere(gen, obj.first->appearance, tile))
-				continue;
+			std::vector<int3> tiles(possibleTiles.begin(), possibleTiles.end());
+			//new tiles vector after each object has been placed, OR misplaced area has been sealed off
 
-			//avoid borders
-			if (gen->isPossible(tile))
+			boost::remove_if(tiles, [gen, obj, this](int3 &tile)-> bool
 			{
+				//object must be accessible from at least one surounding tile
+				return !this->isAccessibleFromAnywhere(gen, obj.first->appearance, tile);
+			});
+
+			// smallest distance to zone center, greatest distance to nearest object
+			auto isCloser = [this, gen](const int3 & lhs, const int3 & rhs) -> bool
+			{
+				float lDist = this->pos.dist2d(lhs);
+				float rDist = this->pos.dist2d(rhs);
+				lDist *= (lDist > 12) ? 10 : 1; //objects within 12 tile radius are preferred (smaller distance rating)
+				rDist *= (rDist > 12) ? 10 : 1;
+
+				return (lDist * 0.5f - std::sqrt(gen->getNearestObjectDistance(lhs))) < (rDist * 0.5f - std::sqrt(gen->getNearestObjectDistance(rhs)));
+			};
+
+			boost::sort(tiles, isCloser);
+
+			if (tiles.empty())
+			{
+				logGlobal->errorStream() << boost::format("Failed to fill zone %d due to lack of space") % id;
+				return false;
+			}
+			for (auto tile : tiles)
+			{
+				//code partially adapted from findPlaceForObject()
+
 				if (areAllTilesAvailable(gen, obj.first, tile, tilesBlockedByObject))
+					gen->setOccupied(pos, ETileType::BLOCKED); //why?
+				else
+					continue;
+
+				EObjectPlacingResult::EObjectPlacingResult result = tryToPlaceObjectAndConnectToPath(gen, obj.first, tile);
+				if (result == EObjectPlacingResult::SUCCESS)
 				{
 					placeObject(gen, obj.first, tile);
 					guardObject(gen, obj.first, obj.second, (obj.first->ID == Obj::MONOLITH_TWO_WAY), true);
-					result = true;
+					finished = true;
 					break;
 				}
+				else if (result == EObjectPlacingResult::CANNOT_FIT)
+					continue; // next tile
+				else if (result == EObjectPlacingResult::SEALED_OFF)
+				{
+					break; //tiles expired, pick new ones
+				}
+				else
+					throw (rmgException("Wrong result of tryToPlaceObjectAndConnectToPath()"));
 			}
-		}
-		if (!result)
-		{
-			logGlobal->errorStream() << boost::format("Failed to fill zone %d due to lack of space") % id;
-			//TODO CLEANUP!
-			return false;
 		}
 	}
 
@@ -1657,6 +1683,12 @@ void CRmgTemplateZone::createTreasures(CMapGenerator* gen)
 
 	//place biggest treasures first at large distance, place smaller ones inbetween
 	boost::sort(treasureInfo, valueComparator);
+
+	//sort treasures by ascending value so we can stop checking treasures with too high value
+	boost::sort(possibleObjects, [](const ObjectInfo& oi1, const ObjectInfo& oi2) -> bool
+	{
+		return oi1.value < oi2.value;
+	});
 
 	int totalDensity = 0;
 	for (auto t : treasureInfo)
@@ -1993,13 +2025,8 @@ bool CRmgTemplateZone::findPlaceForObject(CMapGenerator* gen, CGObjectInstance* 
 	//we need object apperance to deduce free tile
 	setTemplateForObject(gen, obj);
 
-	//si32 min_dist = sqrt(tileinfo.size()/density);
 	int best_distance = 0;
 	bool result = false;
-	//si32 w = gen->map->width;
-	//si32 h = gen->map->height;
-
-	//logGlobal->infoStream() << boost::format("Min dist for density %f is %d") % density % min_dist;
 
 	auto tilesBlockedByObject = obj->getBlockedOffsets();
 
@@ -2199,7 +2226,9 @@ ObjectInfo CRmgTemplateZone::getRandomObject(CMapGenerator* gen, CTreasurePileIn
 	//roulette wheel
 	for (ObjectInfo &oi : possibleObjects) //copy constructor turned out to be costly
 	{
-		if (oi.value >= minValue && oi.value <= maxVal && oi.maxPerZone > 0)
+		if (oi.value > maxVal)
+			break; //this assumes values are sorted in ascending order
+		if (oi.value >= minValue && oi.maxPerZone > 0)
 		{
 			int3 newVisitableOffset = oi.templ.getVisitableOffset(); //visitablePos assumes object will be shifter by visitableOffset
 			int3 newVisitablePos = info.nextTreasurePos;

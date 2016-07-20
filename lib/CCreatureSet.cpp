@@ -46,12 +46,12 @@ bool CCreatureSet::setCreature(SlotID slot, CreatureID type, TQuantity quantity)
 {
 	if(!slot.validSlot())
 	{
-        logGlobal->errorStream() << "Cannot set slot " << slot;
+		logGlobal->errorStream() << "Cannot set slot " << slot;
 		return false;
 	}
 	if(!quantity)
 	{
-        logGlobal->warnStream() << "Using set creature to delete stack?";
+		logGlobal->warnStream() << "Using set creature to delete stack?";
 		eraseStack(slot);
 		return true;
 	}
@@ -172,7 +172,7 @@ void CCreatureSet::addToSlot(SlotID slot, CreatureID cre, TQuantity count, bool 
 	}
 	else
 	{
-        logGlobal->errorStream() << "Failed adding to slot!";
+		logGlobal->errorStream() << "Failed adding to slot!";
 	}
 }
 
@@ -190,7 +190,7 @@ void CCreatureSet::addToSlot(SlotID slot, CStackInstance *stack, bool allowMergi
 	}
 	else
 	{
-        logGlobal->errorStream() << "Cannot add to slot " << slot << " stack " << *stack;
+		logGlobal->errorStream() << "Cannot add to slot " << slot << " stack " << *stack;
 	}
 }
 
@@ -414,10 +414,10 @@ CStackInstance * CCreatureSet::detachStack(SlotID slot)
 	CStackInstance *ret = stacks[slot];
 
 	//if(CArmedInstance *armedObj = castToArmyObj())
-    if(ret)
+	if(ret)
 	{
 		ret->setArmyObj(nullptr); //detaches from current armyobj
-        assert(!ret->armyObj); //we failed detaching?
+		assert(!ret->armyObj); //we failed detaching?
 	}
 
 	stacks.erase(slot);

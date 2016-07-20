@@ -1274,7 +1274,7 @@ void CGTownInstance::addHeroToStructureVisitors( const CGHeroInstance *h, si32 s
 	else
 	{
 		//should never ever happen
-        logGlobal->errorStream() << "Cannot add hero " << h->name << " to visitors of structure #" << structureInstanceID;
+		logGlobal->errorStream() << "Cannot add hero " << h->name << " to visitors of structure #" << structureInstanceID;
 		assert(0);
 	}
 }

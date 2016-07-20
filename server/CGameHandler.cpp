@@ -900,15 +900,19 @@ void CGameHandler::applyBattleEffects(BattleAttack &bat, const CStack *att, cons
 	bat.bsa.push_back(bsa); //add this stack to the list of victims after drain life has been calculated
 
 	//fire shield handling
-	if(!bat.shot() && def->hasBonusOfType(Bonus::FIRE_SHIELD) && !att->hasBonusOfType (Bonus::FIRE_IMMUNITY))
+	if(!bat.shot() && !vstd::contains(def->state, EBattleStackState::CLONED) &&
+		def->hasBonusOfType(Bonus::FIRE_SHIELD) && !att->hasBonusOfType(Bonus::FIRE_IMMUNITY))
 	{
+		// TODO: Fire sheild damage should be calculated separately after BattleAttack applied.
+		// Currently it's looks like attacking stack damage itself with defenders fire shield.
+		// So no separate message on spell damge in log and expirience calculation is likely wrong too.
 		BattleStackAttacked bsa2;
 		bsa2.stackAttacked = att->ID; //invert
 		bsa2.attackerID = def->ID;
 		bsa2.flags |= BattleStackAttacked::EFFECT; //FIXME: play animation upon efreet and not attacker
 		bsa2.effect = 11;
 
-		bsa2.damageAmount = (bsa.damageAmount * def->valOfBonuses(Bonus::FIRE_SHIELD)) / 100; //TODO: scale with attack/defense
+		bsa2.damageAmount = (std::min(def->totalHelth(), bsa.damageAmount) * def->valOfBonuses(Bonus::FIRE_SHIELD)) / 100; //TODO: scale with attack/defense
 		att->prepareAttacked(bsa2, gameState()->getRandomGenerator());
 		bat.bsa.push_back(bsa2);
 	}
@@ -937,7 +941,7 @@ void CGameHandler::handleConnection(std::set<PlayerColor> players, CConnection &
 
 				packType = typeList.getTypeID(pack); //get the id of type
 
-                logGlobal->traceStream() << boost::format("Received client message (request %d by player %d) of type with ID=%d (%s).\n")
+				logGlobal->traceStream() << boost::format("Received client message (request %d by player %d) of type with ID=%d (%s).\n")
 					% requestID % player.getNum() % packType % typeid(*pack).name();
 			}
 
@@ -964,7 +968,7 @@ void CGameHandler::handleConnection(std::set<PlayerColor> players, CConnection &
 				if(!result)
 				{
 					complain((boost::format("Got false in applying %s... that request must have been fishy!")
-				            % typeid(*pack).name()).str());
+						% typeid(*pack).name()).str());
 				}
 				logGlobal->traceStream() << "Message successfully applied (result=" << result << ")!";
 				sendPackageResponse(true);
@@ -981,7 +985,7 @@ void CGameHandler::handleConnection(std::set<PlayerColor> players, CConnection &
 	catch(boost::system::system_error &e) //for boost errors just log, not crash - probably client shut down connection
 	{
 		assert(!c.connected); //make sure that connection has been marked as broken
-        logGlobal->errorStream() << e.what();
+		logGlobal->errorStream() << e.what();
 		end2 = true;
 	}
 	catch(...)
@@ -991,7 +995,7 @@ void CGameHandler::handleConnection(std::set<PlayerColor> players, CConnection &
 		throw;
 	}
 
-    logGlobal->errorStream() << "Ended handling connection";
+	logGlobal->errorStream() << "Ended handling connection";
 }
 
 int CGameHandler::moveStack(int stack, BattleHex dest)
@@ -1328,9 +1332,9 @@ void CGameHandler::init(StartInfo *si)
 	}
 
 	gs = new CGameState();
-    logGlobal->infoStream() << "Gamestate created!";
+	logGlobal->infoStream() << "Gamestate created!";
 	gs->init(si);
-    logGlobal->infoStream() << "Gamestate initialized!";
+	logGlobal->infoStream() << "Gamestate initialized!";
 
 	// reset seed, so that clients can't predict any following random values
 	gs->getRandomGenerator().resetSeed();
@@ -1343,7 +1347,7 @@ void CGameHandler::init(StartInfo *si)
 
 static bool evntCmp(const CMapEvent &a, const CMapEvent &b)
 {
-    return a.earlierThan(b);
+	return a.earlierThan(b);
 }
 
 void CGameHandler::setPortalDwelling(const CGTownInstance * town, bool forced=false, bool clear = false)
@@ -1351,7 +1355,7 @@ void CGameHandler::setPortalDwelling(const CGTownInstance * town, bool forced=fa
 	const PlayerState *p = gs->getPlayer(town->tempOwner);
 	if(!p)
 	{
-        logGlobal->warnStream() << "There is no player owner of town " << town->name << " at " << town->pos;
+		logGlobal->warnStream() << "There is no player owner of town " << town->name << " at " << town->pos;
 		return;
 	}
 
@@ -1389,7 +1393,7 @@ void CGameHandler::setPortalDwelling(const CGTownInstance * town, bool forced=fa
 
 void CGameHandler::newTurn()
 {
-    logGlobal->traceStream() << "Turn " << gs->day+1;
+	logGlobal->traceStream() << "Turn " << gs->day+1;
 	NewTurn n;
 	n.specialWeek = NewTurn::NO_ACTION;
 	n.creatureid = CreatureID::NONE;
@@ -1702,7 +1706,7 @@ void CGameHandler::newTurn()
 		}
 	}
 
-    logGlobal->traceStream() << "Info about turn " << n.day << "has been sent!";
+	logGlobal->traceStream() << "Info about turn " << n.day << "has been sent!";
 	handleTimeEvents();
 	//call objects
 	for(auto & elem : gs->map->objects)
@@ -1747,17 +1751,17 @@ void CGameHandler::run(bool resume)
 		std::set<PlayerColor> players;
 		(*cc) >> players; //how many players will be handled at that client
 
-        std::stringstream sbuffer;
-        sbuffer << "Connection " << cc->connectionID << " will handle " << players.size() << " player: ";
+		std::stringstream sbuffer;
+		sbuffer << "Connection " << cc->connectionID << " will handle " << players.size() << " player: ";
 		for(PlayerColor color : players)
 		{
-            sbuffer << color << " ";
+			sbuffer << color << " ";
 			{
 				boost::unique_lock<boost::recursive_mutex> lock(gsm);
 				connections[color] = cc;
 			}
 		}
-        logGlobal->infoStream() << sbuffer.str();
+		logGlobal->infoStream() << sbuffer.str();
 
 		cc->addStdVecItems(gs);
 		cc->enableStackSendingByID();
@@ -1892,27 +1896,31 @@ void CGameHandler::checkBattleStateChanges()
 	}
 }
 
-void CGameHandler::giveSpells( const CGTownInstance *t, const CGHeroInstance *h )
+void CGameHandler::giveSpells(const CGTownInstance *t, const CGHeroInstance *h)
 {
 	if(!h->hasSpellbook())
 		return; //hero hasn't spellbook
 	ChangeSpells cs;
 	cs.hid = h->id;
 	cs.learn = true;
-	for(int i=0; i<std::min(t->mageGuildLevel(),h->getSecSkillLevel(SecondarySkill::WISDOM)+2);i++)
+	if(t->hasBuilt(BuildingID::GRAIL, ETownType::CONFLUX) && t->hasBuilt(BuildingID::MAGES_GUILD_1))
 	{
-		if (t->hasBuilt(BuildingID::GRAIL, ETownType::CONFLUX)) //Aurora Borealis
+		// Aurora Borealis give spells of all levels even if only level 1 mages guild built
+		for(int i = 0; i < h->getSecSkillLevel(SecondarySkill::WISDOM)+2; i++)
 		{
 			std::vector<SpellID> spells;
-			getAllowedSpells(spells, i);
-			for (auto & spell : spells)
+			getAllowedSpells(spells, i+1);
+			for(auto & spell : spells)
 				cs.spells.insert(spell);
 		}
-		else
+	}
+	else
+	{
+		for(int i = 0; i < std::min(t->mageGuildLevel(), h->getSecSkillLevel(SecondarySkill::WISDOM)+2); i++)
 		{
-			for(int j=0; j<t->spellsAtLevel(i+1,true) && j<t->spells.at(i).size(); j++)
+			for(int j = 0; j < t->spellsAtLevel(i+1, true) && j < t->spells.at(i).size(); j++)
 			{
-				if(!vstd::contains(h->spells,t->spells.at(i).at(j)))
+				if(!vstd::contains(h->spells, t->spells.at(i).at(j)))
 					cs.spells.insert(t->spells.at(i).at(j));
 			}
 		}
@@ -1931,7 +1939,7 @@ bool CGameHandler::removeObject( const CGObjectInstance * obj )
 {
 	if(!obj || !getObj(obj->id))
 	{
-        logGlobal->errorStream() << "Something wrong, that object already has been removed or hasn't existed!";
+		logGlobal->errorStream() << "Something wrong, that object already has been removed or hasn't existed!";
 		return false;
 	}
 
@@ -1956,16 +1964,16 @@ bool CGameHandler::moveHero( ObjectInstanceID hid, int3 dst, ui8 teleporting, bo
 	if(!h  || (asker != PlayerColor::NEUTRAL && (teleporting  ||   h->getOwner() != gs->currentPlayer)) //not turn of that hero or player can't simply teleport hero (at least not with this function)
 	  )
 	{
-        logGlobal->errorStream() << "Illegal call to move hero!";
+		logGlobal->errorStream() << "Illegal call to move hero!";
 		return false;
 	}
 
-    logGlobal->traceStream() << "Player " << asker << " wants to move hero "<< hid.getNum() << " from "<< h->pos << " to " << dst;
+	logGlobal->traceStream() << "Player " << asker << " wants to move hero "<< hid.getNum() << " from "<< h->pos << " to " << dst;
 	const int3 hmpos = CGHeroInstance::convertPosition(dst, false);
 
 	if(!gs->map->isInTheMap(hmpos))
 	{
-        logGlobal->errorStream() << "Destination tile is outside the map!";
+		logGlobal->errorStream() << "Destination tile is outside the map!";
 		return false;
 	}
 
@@ -2142,7 +2150,7 @@ bool CGameHandler::teleportHero(ObjectInstanceID hid, ObjectInstanceID dstid, ui
 	const CGTownInstance *t = getTown(dstid);
 
 	if ( !h || !t || h->getOwner() != gs->currentPlayer )
-        logGlobal->errorStream()<<"Invalid call to teleportHero!";
+		logGlobal->errorStream() << "Invalid call to teleportHero!";
 
 	const CGTownInstance *from = h->visitedTown;
 	if(((h->getOwner() != t->getOwner())
@@ -2519,7 +2527,7 @@ void CGameHandler::heroExchange(ObjectInstanceID hero1, ObjectInstanceID hero2)
 
 void CGameHandler::sendToAllClients( CPackForClient * info )
 {
-    logGlobal->traceStream() << "Sending to all clients a package of type " << typeid(*info).name();
+	logGlobal->traceStream() << "Sending to all clients a package of type " << typeid(*info).name();
 	for(auto & elem : conns)
 	{
 		boost::unique_lock<boost::mutex> lock(*(elem)->wmx);
@@ -2565,13 +2573,13 @@ void CGameHandler::sendAndApply( NewStructures * info )
 
 void CGameHandler::save(const std::string & filename )
 {
-    logGlobal->infoStream() << "Saving to " << filename;
+	logGlobal->infoStream() << "Saving to " << filename;
 	const auto stem	= FileInfo::GetPathStem(filename);
 	const auto savefname = stem.to_string() + ".vsgm1";
 	CResourceHandler::get("local")->createResource(savefname);
 
 	{
-        logGlobal->infoStream() << "Ordering clients to serialize...";
+		logGlobal->infoStream() << "Ordering clients to serialize...";
 		SaveGame sg(savefname);
 		sendToAllClients(&sg);
 	}
@@ -2589,20 +2597,20 @@ void CGameHandler::save(const std::string & filename )
 		{
 			CSaveFile save(*CResourceHandler::get("local")->getResourceName(ResourceID(stem.to_string(), EResType::SERVER_SAVEGAME)));
 			saveCommonState(save);
-            logGlobal->infoStream() << "Saving server state";
+			logGlobal->infoStream() << "Saving server state";
 			save << *this;
 		}
-        logGlobal->infoStream() << "Game has been successfully saved!";
+		logGlobal->infoStream() << "Game has been successfully saved!";
 	}
 	catch(std::exception &e)
 	{
-        logGlobal->errorStream() << "Failed to save game: " << e.what();
+		logGlobal->errorStream() << "Failed to save game: " << e.what();
 	}
 }
 
 void CGameHandler::close()
 {
-    logGlobal->infoStream() << "We have been requested to close.";
+	logGlobal->infoStream() << "We have been requested to close.";
 
 	if(gs->initialOpts->mode == StartInfo::DUEL)
 	{
@@ -2787,8 +2795,8 @@ bool CGameHandler::buildStructure( ObjectInstanceID tid, BuildingID requestedID,
 		}
 	}
 
-	//Performs stuff that has to be done after new building is built
-	auto processBuiltStructure = [t, this](const BuildingID buildingID)
+	//Performs stuff that has to be done before new building is built
+	auto processBeforeBuiltStructure = [t, this](const BuildingID buildingID)
 	{
 		if(buildingID >= BuildingID::DWELL_FIRST) //dwelling
 		{
@@ -2817,8 +2825,14 @@ bool CGameHandler::buildStructure( ObjectInstanceID tid, BuildingID requestedID,
 		{
 			setPortalDwelling(t);
 		}
+	};
 
-		if(buildingID <= BuildingID::MAGES_GUILD_5) //it's mage guild
+	//Performs stuff that has to be done after new building is built
+	auto processAfterBuiltStructure = [t, this](const BuildingID buildingID)
+	{
+		if(buildingID <= BuildingID::MAGES_GUILD_5 || //it's mage guild
+			(t->subID == ETownType::TOWER && buildingID == BuildingID::LIBRARY) ||
+			(t->subID == ETownType::CONFLUX && buildingID == BuildingID::GRAIL))
 		{
 			if(t->visitingHero)
 				giveSpells(t,t->visitingHero);
@@ -2869,9 +2883,9 @@ bool CGameHandler::buildStructure( ObjectInstanceID tid, BuildingID requestedID,
 		}
 	}
 
-	//Other post-built events
+	// FIXME: it's done before NewStructures applied because otherwise town window wont be properly updated on client. That should be actually fixed on client and not on server.
 	for(auto builtID : ns.bid)
-		processBuiltStructure(builtID);
+		processBeforeBuiltStructure(builtID);
 
 	//Take cost
 	if (!force)
@@ -2884,6 +2898,10 @@ bool CGameHandler::buildStructure( ObjectInstanceID tid, BuildingID requestedID,
 
 	//We know what has been built, appluy changes. Do this as final step to properly update town window
 	sendAndApply(&ns);
+
+	//Other post-built events. To some logic like giving spells to work gamestate changes for new building must be already in place!
+	for(auto builtID : ns.bid)
+		processAfterBuiltStructure(builtID);
 
 	// now when everything is built - reveal tiles for lookout tower
 	FoWChange fw;
@@ -3784,7 +3802,7 @@ bool CGameHandler::makeBattleAction( BattleAction &ba )
 			BattleHex startingPos = stack->position;
 			int distance = moveStack(ba.stackNumber, ba.destinationTile);
 
-            logGlobal->traceStream() << stack->nodeName() << " will attack " << destinationStack->nodeName();
+			logGlobal->traceStream() << stack->nodeName() << " will attack " << destinationStack->nodeName();
 
 			if(stack->position != ba.destinationTile //we wasn't able to reach destination tile
 				&& !(stack->doubleWide()
@@ -3793,7 +3811,7 @@ bool CGameHandler::makeBattleAction( BattleAction &ba )
 				)
 			{
 				std::string problem = "We cannot move this stack to its destination " + stack->getCreature()->namePl;
-                logGlobal->warnStream() << problem;
+				logGlobal->warnStream() << problem;
 				complain(problem);
 				ok = false;
 				sendAndApply(&end_action);
@@ -4024,7 +4042,7 @@ bool CGameHandler::makeBattleAction( BattleAction &ba )
 				attack.destinationTile = gs->curB->wallPartToBattleHex(EWallPart::EWallPart(attack.attackedPart));
 
 				logGlobal->traceStream() << "Catapult attacks " << (int)attack.attackedPart
-				                         << " dealing " << (int)attack.damageDealt << " damage";
+										 << " dealing " << (int)attack.damageDealt << " damage";
 
 				//removing creatures in turrets / keep if one is destroyed
 				if(attack.damageDealt > 0 && (attackedPart == EWallPart::KEEP ||
@@ -4370,12 +4388,12 @@ bool CGameHandler::makeCustomAction( BattleAction &ba )
 			const CGHeroInstance *h = gs->curB->battleGetFightingHero(ba.side);
 			if(!h)
 			{
-                logGlobal->warnStream() << "Wrong caster!";
+				logGlobal->warnStream() << "Wrong caster!";
 				return false;
 			}
 			if(ba.additionalInfo >= VLC->spellh->objects.size())
 			{
-                logGlobal->warnStream() << "Wrong spell id (" << ba.additionalInfo << ")!";
+				logGlobal->warnStream() << "Wrong spell id (" << ba.additionalInfo << ")!";
 				return false;
 			}
 
@@ -4702,7 +4720,7 @@ void CGameHandler::handleTimeEvents()
 
 			ev.firstOccurence += ev.nextOccurence;
 			auto it = gs->map->events.begin();
-            while ( it !=gs->map->events.end() && it->earlierThanOrEqual(ev))
+			while(it != gs->map->events.end() && it->earlierThanOrEqual(ev))
 				it++;
 			gs->map->events.insert(it, ev);
 		}
@@ -4785,7 +4803,7 @@ void CGameHandler::handleTownEvents(CGTownInstance * town, NewTurn &n)
 
 			ev.firstOccurence += ev.nextOccurence;
 			auto it = town->events.begin();
-            while ( it != town->events.end() &&  it->earlierThanOrEqual(ev))
+			while(it != town->events.end() && it->earlierThanOrEqual(ev))
 				it++;
 			town->events.insert(it, ev);
 		}
@@ -4805,7 +4823,7 @@ void CGameHandler::handleTownEvents(CGTownInstance * town, NewTurn &n)
 bool CGameHandler::complain( const std::string &problem )
 {
 	sendMessageToAll("Server encountered a problem: " + problem);
-    logGlobal->errorStream() << problem;
+	logGlobal->errorStream() << problem;
 	return true;
 }
 
@@ -5760,8 +5778,8 @@ void CGameHandler::runBattle()
 					}
 					else
 					{
-                        logGlobal->traceStream() << "Activating " << next->nodeName();
-                        auto nextId = next->ID;
+						logGlobal->traceStream() << "Activating " << next->nodeName();
+						auto nextId = next->ID;
 						BattleSetActiveStack sas;
 						sas.stack = nextId;
 						sendAndApply(&sas);
@@ -5935,12 +5953,12 @@ void CGameHandler::spawnWanderingMonsters(CreatureID creatureID)
 	getFreeTiles(tiles);
 	ui32 amount = tiles.size() / 200; //Chance is 0.5% for each tile
 	std::random_shuffle(tiles.begin(), tiles.end());
-    logGlobal->traceStream() << "Spawning wandering monsters. Found " << tiles.size() << " free tiles. Creature type: " << creatureID;
+	logGlobal->traceStream() << "Spawning wandering monsters. Found " << tiles.size() << " free tiles. Creature type: " << creatureID;
 	const CCreature *cre = VLC->creh->creatures.at(creatureID);
 	for (int i = 0; i < amount; ++i)
 	{
 		tile = tiles.begin();
-        logGlobal->traceStream() << "\tSpawning monster at " << *tile;
+		logGlobal->traceStream() << "\tSpawning monster at " << *tile;
 		putNewMonster(creatureID, cre->getRandomAmount(std::rand), *tile);
 		tiles.erase(tile); //not use it again
 	}
@@ -6134,7 +6152,7 @@ CasualtiesAfterBattle::CasualtiesAfterBattle(const CArmedInstance * _army, Battl
 		{
 			if(st->alive() && st->count > 0)
 			{
-				logGlobal->debugStream() << "Permanently summoned " + st->count << " units.";
+				logGlobal->debugStream() << "Permanently summoned " << st->count << " units.";
 				const CreatureID summonedType = st->type->idNumber;
 				summoned[summonedType] += st->count;
 			}

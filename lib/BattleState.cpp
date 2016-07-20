@@ -665,7 +665,7 @@ ui8 BattleInfo::whatSide(PlayerColor player) const
 		if(sides[i].color == player)
 			return i;
 
-    logGlobal->warnStream() << "BattleInfo::whatSide: Player " << player << " is not in battle!";
+	logGlobal->warnStream() << "BattleInfo::whatSide: Player " << player << " is not in battle!";
 	return -1;
 }
 
@@ -986,6 +986,11 @@ const CGHeroInstance * CStack::getMyHero() const
 				return dynamic_cast<const CGHeroInstance *>(n);
 
 	return nullptr;
+}
+
+ui32 CStack::totalHelth() const
+{
+	return (MaxHealth() * (count-1)) + firstHPleft;
 }
 
 std::string CStack::nodeName() const

@@ -48,7 +48,7 @@ static int lowestSpeed(const CGHeroInstance * chi)
 {
 	if(!chi->stacksCount())
 	{
-        logGlobal->errorStream() << "Error! Hero " << chi->id.getNum() << " ("<<chi->name<<") has no army!";
+		logGlobal->errorStream() << "Error! Hero " << chi->id.getNum() << " ("<<chi->name<<") has no army!";
 		return 20;
 	}
 	auto i = chi->Slots().begin();
@@ -172,7 +172,7 @@ void CGHeroInstance::setSecSkillLevel(SecondarySkill which, int val, bool abs)
 
 				if(elem.second > 3) //workaround to avoid crashes when same sec skill is given more than once
 				{
-                    logGlobal->warnStream() << "Warning: Skill " << which << " increased over limit! Decreasing to Expert.";
+					logGlobal->warnStream() << "Warning: Skill " << which << " increased over limit! Decreasing to Expert.";
 					elem.second = 3;
 				}
 				updateSkill(which, elem.second); //when we know final value
@@ -368,7 +368,7 @@ void CGHeroInstance::initArmy(IArmyDescriptor *dst /*= nullptr*/)
 			if(!getArt(convSlot))
 				putArtifact(convSlot, CArtifactInstance::createNewArtifactInstance(aid));
 			else
-                logGlobal->warnStream() << "Hero " << name << " already has artifact at " << slot << ", omitting giving " << aid;
+				logGlobal->warnStream() << "Hero " << name << " already has artifact at " << slot << ", omitting giving " << aid;
 		}
 		else
 			dst->setCreature(SlotID(stackNo-warMachinesGiven), stack.creature, count);
@@ -661,7 +661,7 @@ void CGHeroInstance::initObj()
 				hs->addNewBonus(bonus);
 				break;
 			default:
-                logGlobal->warnStream() << "Unexpected hero specialty " << type;
+				logGlobal->warnStream() << "Unexpected hero specialty " << type;
 		}
 	}
 	specialty.push_back(hs); //will it work?
@@ -718,7 +718,7 @@ void CGHeroInstance::Updatespecialty() //TODO: calculate special value of bonuse
 						}
 						else //no creature found, can't calculate value
 						{
-                            logGlobal->warnStream() << "Primary skill specialty growth supported only with creature type limiters";
+							logGlobal->warnStream() << "Primary skill specialty growth supported only with creature type limiters";
 							break;
 						}
 
@@ -962,26 +962,26 @@ bool CGHeroInstance::canCastThisSpell(const CSpell * spell) const
 
 	const bool levelBonus = hasBonusOfType(Bonus::SPELLS_OF_LEVEL, spell->level);
 
-    if (spell->isSpecialSpell())
-    {
-        if (inSpellBook)
-        {//hero has this spell in spellbook
-            logGlobal->errorStream() << "Special spell " << spell->name << "in spellbook.";
-        }
-        return specificBonus;
-    }
-    else if(!isAllowed)
-    {
-        if (inSpellBook)
-        {//hero has this spell in spellbook
-            logGlobal->errorStream() << "Banned spell " << spell->name << " in spellbook.";
-        }
-        return specificBonus || schoolBonus || levelBonus;
-    }
-    else
-    {
+	if(spell->isSpecialSpell())
+	{
+		if(inSpellBook)
+		{//hero has this spell in spellbook
+			logGlobal->errorStream() << "Special spell " << spell->name << "in spellbook.";
+		}
+		return specificBonus;
+	}
+	else if(!isAllowed)
+	{
+		if(inSpellBook)
+		{//hero has this spell in spellbook
+			logGlobal->errorStream() << "Banned spell " << spell->name << " in spellbook.";
+		}
+		return specificBonus || schoolBonus || levelBonus;
+	}
+	else
+	{
 		return inSpellBook || schoolBonus || specificBonus || levelBonus;
-    }
+	}
 }
 
 /**

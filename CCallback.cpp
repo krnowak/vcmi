@@ -55,7 +55,7 @@ int CCallback::selectionMade(int selection, QueryID queryID)
 	ASSERT_IF_CALLED_WITH_PLAYER
 	if(queryID == QueryID(-1))
 	{
-        logGlobal->errorStream() << "Cannot answer the query -1!";
+		logGlobal->errorStream() << "Cannot answer the query -1!";
 		return false;
 	}
 
@@ -66,7 +66,8 @@ int CCallback::selectionMade(int selection, QueryID queryID)
 
 void CCallback::recruitCreatures(const CGDwelling *obj, const CArmedInstance * dst, CreatureID ID, ui32 amount, si32 level/*=-1*/)
 {
-	if(player!=obj->tempOwner  &&  obj->ID != Obj::WAR_MACHINE_FACTORY)
+	// TODO exception for neutral dwellings shouldn't be hardcoded
+	if(player != obj->tempOwner && obj->ID != Obj::WAR_MACHINE_FACTORY && obj->ID != Obj::REFUGEE_CAMP)
 		return;
 
 	RecruitCreatures pack(obj->id, dst->id, ID, amount, level);
@@ -92,7 +93,7 @@ bool CCallback::upgradeCreature(const CArmedInstance *obj, SlotID stackPos, Crea
 
 void CCallback::endTurn()
 {
-    logGlobal->traceStream() << "Player " << *player << " ended his turn.";
+	logGlobal->traceStream() << "Player " << *player << " ended his turn.";
 	EndTurn pack;
 	sendRequest(&pack); //report that we ended turn
 }
@@ -184,7 +185,7 @@ int CBattleCallback::sendRequest(const CPack *request)
 	int requestID = cl->sendRequest(request, *player);
 	if(waitTillRealize)
 	{
-        logGlobal->traceStream() << boost::format("We'll wait till request %d is answered.\n") % requestID;
+		logGlobal->traceStream() << boost::format("We'll wait till request %d is answered.\n") % requestID;
 		auto gsUnlocker = vstd::makeUnlockSharedGuardIf(getGsMutex(), unlockGsWhenWaiting);
 		cl->waitingRequest.waitWhileContains(requestID);
 	}
